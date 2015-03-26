@@ -1,0 +1,67 @@
+.avatar {
+  display: inline-block;
+}
+
+md-sidenav md-list {
+  padding: 0px 0px 8px 0px;
+}
+
+md-card {
+  background-color: #F4F4F4;
+}
+
+ng-md-icon {
+  vertical-align: middle;
+}
+
+.mainTitle {
+  font-size: 1.8em;
+}
+
+md-toolbar h1 {
+  margin: auto;
+}
+
+md-toolbar h1 {
+  font-weight: 400;
+}
+
+#description, #aboutMsg {
+  background-color: #19A094;
+}
+
+#description, #aboutMsg {
+  margin-top: 30px;
+
+  padding-left: 20px;
+  padding-right: 20px;
+}
+
+#content {
+  overflow: hidden;
+}
+
+#content {
+  margin-top: 30px;
+  margin-bottom: 30px;
+
+  padding-left: 20px;
+  padding-right: 20px;
+  padding-bottom: 20px;
+}
+
+.mobile {
+  margin-left: 20px;
+  margin-right: 20px;
+}
+
+.desktop {
+  margin-left: 300px;
+  margin-right: 300px;
+}
+
+.formError {
+  font-size: 0.75em;
+  padding-left: 10px;
+  padding-right: 10px;
+}
