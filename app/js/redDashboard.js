@@ -3,8 +3,10 @@ var redDashboard = angular.module('redDashboard', [
                               ]);
 
 redDashboard.controller('MainCtrl', [
-  '$scope', '$route', '$routeParams', '$location', '$mdMedia', '$mdSidenav',
-  function ($scope, $route, $routeParams, $location, $mdMedia, $mdSidenav) {
+  '$scope', '$rootScope', '$route', '$routeParams',
+  '$location', '$mdMedia', '$mdSidenav',
+  function ($scope, $rootScope, $route, $routeParams,
+            $location, $mdMedia, $mdSidenav) {
     $scope.go = function (path) {
       $location.url(path);
 
@@ -14,6 +16,8 @@ redDashboard.controller('MainCtrl', [
     };
 
     $scope.username = 'John Doe';
+    $rootScope.bloodReqs = [];
+    $rootScope.donors = [];
 
     $scope.toggleSidebar = function () {
       $mdSidenav('left').toggle();
@@ -39,17 +43,39 @@ redDashboard.controller('ProfileCtrl', [
 
 
 redDashboard.controller('RequestsCtrl', [
-  '$scope', '$routeParams',
-  function ($scope, $routeParams) {
+  '$scope', '$rootScope', '$routeParams', '$http',
+  function ($scope, $rootScope, $routeParams, $http) {
+    $scope.bloodReqs = $rootScope.bloodReqs;
+    console.log('loading bloodreqs...');
 
+    $http.get('/bloodreqs')
+      .success(function (data, status, headers, config) {
+        console.log('ng, got data', data);
+        $rootScope.bloodReqs = data;
+        $scope.bloodReqs = data;
+      })
+      .error(function () {
+        console.log('Error in requesting');
+      });
   }
 ]);
 
 
 redDashboard.controller('DonorsCtrl', [
-  '$scope', '$routeParams',
-  function ($scope, $routeParams) {
+  '$scope', '$rootScope', '$routeParams', '$http',
+  function ($scope, $rootScope, $routeParams, $http) {
+    $scope.donors = $rootScope.donors;
+    console.log('loading donors...');
 
+    $http.get('/donors')
+      .success(function (data) {
+        console.log('ng, got data', data);
+        $rootScope.donors = data;
+        $scope.donors = data;
+      })
+      .error(function () {
+        console.log('Error in requesting');
+      });
   }
 ]);
 

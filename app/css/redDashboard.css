@@ -65,3 +65,16 @@ md-toolbar h1 {
   padding-left: 10px;
   padding-right: 10px;
 }
+
+.info {
+  background-color: #19A094;
+  padding: 20px;
+}
+
+.listName {
+  font-size: 1em;
+}
+
+.listOthers {
+  font-size: 0.75em;
+}

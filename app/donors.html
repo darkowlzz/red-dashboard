@@ -1,3 +1,38 @@
 <p>
   Donors page
+
+  <div layout="column" layout-margin>
+    <div class="md-whiteframe-z5 info" flex ng-repeat="donor in donors" layout-margin>
+      <div layout="row" layout-align="space-between center">
+        <div flex="55">
+          <ng-md-icon class="avatar" icon="person"></ng-md-icon>
+          <span class="listName">{{donor.name}}</span>
+        </div>
+        <div flex="45">
+          <ng-md-icon class="avatar" icon="lens"></ng-md-icon>
+          <span class="listOthers">{{donor.group}}</span>
+        </div>
+      </div>
+      <div layout="row" layout-align="space-between center">
+        <div flex="55">
+          <ng-md-icon class="avatar" icon="location_on"></ng-md-icon>
+          <span class="listOthers">{{donor.address}}</span><br>
+        </div>
+        <div flex="45">
+          <ng-md-icon class="avatar" icon="access_time"></ng-md-icon>
+          <span class="listOthers">{{donor.age}} Years</span><br>
+        </div>
+      </div>
+      <div layout="row" layout-align="space-between center">
+        <div flex="55">
+          <ng-md-icon class="avatar" icon="email"></ng-md-icon>
+          <span class="listOthers">{{donor.email}}</span>
+        </div>
+        <div flex="45">
+          <ng-md-icon class="avatar" icon="phone"></ng-md-icon>
+          <span class="listOthers">{{donor.phone}}</span><br>
+        </div>
+      </div>
+    </div>
+  </div>
 </p>
