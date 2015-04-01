@@ -37,17 +37,12 @@ md-toolbar h1 {
   padding-right: 20px;
 }
 
-#content {
-  overflow: hidden;
-}
-
-#content {
-  margin-top: 30px;
-  margin-bottom: 30px;
-
-  padding-left: 20px;
-  padding-right: 20px;
-  padding-bottom: 20px;
+.site-sidenav,
+.site-sidenav.md-locked-open-add-active,
+.site-sidenav.md-locked-open {
+  width: 254px;
+  min-width: 254px;
+  max-width: 254px;
 }
 
 .mobile {

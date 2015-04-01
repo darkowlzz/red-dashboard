@@ -7,8 +7,50 @@
     <link rel="stylesheet" href="css/redDashboard.css">
   </head>
 
-  <body ng-controller="MainCtrl" ng-cloak>
-    <div layout="column" class="ground">
+  <body layout="row" ng-controller="MainCtrl" ng-cloak>
+
+    <md-sidenav md-is-locked-open="$mdMedia('gt-sm')" class="site-sidenav md-whiteframe-z2" md-component-id="left" ng-cloak="">
+      <md-list layout="column" layout-align="center center">
+        <md-item>
+          <md-button ng-click="go('/profile')">
+            <ng-md-icon class="avatar" icon="account_circle" size="48"></ng-md-icon>
+            Hello, {{ username }}
+          </md-button>
+        </md-item>
+        <md-item>
+          <md-button ng-click="go('/')">
+            <ng-md-icon class="avatar" icon="home" size="48"></ng-md-icon>
+            Dashboard Home
+          </md-button>
+        </md-item>
+        <md-item>
+          <md-button ng-click="go('/requests')">
+            <ng-md-icon class="avatar" icon="favorite" size="48"></ng-md-icon>
+            Blood Requests
+          </md-button>
+        </md-item>
+        <md-item>
+          <md-button ng-click="go('/donors')">
+            <ng-md-icon class="avatar" icon="accessibility" size="48"></ng-md-icon>
+            Blood Donors
+          </md-button>
+        </md-item>
+        <md-item>
+          <md-button ng-click="go('/create-camp')">
+            <ng-md-icon class="avatar" icon="create" size="48"></ng-md-icon>
+            Create Camp
+          </md-button>
+        </md-item>
+        <md-item>
+          <md-button ng-click="go('/')">
+            <ng-md-icon class="avatar" icon="exit_to_app" size="48"></ng-md-icon>
+            Log out
+          </md-button>
+        </md-item>
+      </md-list>
+    </md-sidenav>
+
+    <div layout="column" role="main" flex class="ground">
       <!-- Container #1 -->
       <md-toolbar class="md-tall md-primary" layout="row" layout-align="center center">
         <md-button class="menu" hide-gt-sm ng-click="toggleSidebar()">
@@ -22,60 +64,7 @@
         </div>
       </md-toolbar>
 
-      <!--
-      <md-content>
-        <section class="ground" layout="row" layout-align="center center">
-          <md-button ng-click="go('/')">Home</md-button>
-          <md-button ng-click="go('/about')">About</md-button>
-        </section>
-      </md-content>
-      -->
-
-      <div flex layout="row">
-        <md-sidenav md-is-locked-open="$mdMedia('gt-sm')" class="md-whiteframe-z2" md-component-id="left" ng-cloak="">
-          <md-list layout="column" layout-align="center center">
-            <md-item>
-              <md-button ng-click="go('/profile')">
-                <ng-md-icon class="avatar" icon="account_circle" size="64"></ng-md-icon>
-                Hello, {{ username }}
-              </md-button>
-            </md-item>
-            <md-item>
-              <md-button ng-click="go('/')">
-                <ng-md-icon class="avatar" icon="home" size="64"></ng-md-icon>
-                Dashboard Home
-              </md-button>
-            </md-item>
-            <md-item>
-              <md-button ng-click="go('/requests')">
-                <ng-md-icon class="avatar" icon="favorite" size="64"></ng-md-icon>
-                Blood Requests
-              </md-button>
-            </md-item>
-            <md-item>
-              <md-button ng-click="go('/donors')">
-                <ng-md-icon class="avatar" icon="accessibility" size="64"></ng-md-icon>
-                Blood Donors
-              </md-button>
-            </md-item>
-            <md-item>
-              <md-button ng-click="go('/create-camp')">
-                <ng-md-icon class="avatar" icon="create" size="64"></ng-md-icon>
-                Create Camp
-              </md-button>
-            </md-item>
-            <md-item>
-              <md-button ng-click="go('/')">
-                <ng-md-icon class="avatar" icon="exit_to_app" size="64"></ng-md-icon>
-                Log out
-              </md-button>
-            </md-item>
-          </md-list>
-        </md-sidenav>
-        <md-content flex id="content">
-          <div ng-view></div>
-        </md-content>
-      </div>
+      <md-content ng-view md-scroll-y flex class="md-padding"></md-content>
 
     </div>
 
