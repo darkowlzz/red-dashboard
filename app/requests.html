@@ -1,39 +1,18 @@
 <p>
-  Requests page
-
   <div layout="column" layout-margin>
-    <div class="md-whiteframe-z5 info" flex ng-repeat="req in bloodReqs" layout-margin>
-      <div layout="row" layout-align="space-between center">
-        <div flex="55">
-          <ng-md-icon class="avatar" icon="person"></ng-md-icon>
-          <span class="listName">{{req.name}}</span>
+    <md-card ng-repeat="req in bloodReqs">
+      <md-card-content ng-click="detail(req)">
+        <div layout="row" layout-align="space-between center">
+          <div flex="55">
+            <ng-md-icon class="avatar" icon="person"></ng-md-icon>
+            <span class="listName">{{req.name}}</span>
+          </div>
+          <div flex="45">
+            <ng-md-icon class="avatar" icon="lens"></ng-md-icon>
+            <span class="listOthers">{{req.group}}</span>
+          </div>
         </div>
-        <div flex="45">
-          <ng-md-icon class="avatar" icon="lens"></ng-md-icon>
-          <span class="listOthers">{{req.group}}</span>
-        </div>
-      </div>
-      <div layout="row" layout-align="space-between center">
-        <div flex="55">
-          <ng-md-icon class="avatar" icon="location_on"></ng-md-icon>
-          <span class="listOthers">{{req.address}}</span><br>
-        </div>
-        <div flex="45">
-          <ng-md-icon class="avatar" icon="access_time"></ng-md-icon>
-          <span class="listOthers">{{req.age}} Years</span><br>
-        </div>
-      </div>
-      <div layout="row" layout-align="space-between center">
-        <div flex="55">
-          <ng-md-icon class="avatar" icon="email"></ng-md-icon>
-          <span class="listOthers">{{req.email}}</span>
-        </div>
-        <div flex="45">
-          <ng-md-icon class="avatar" icon="phone"></ng-md-icon>
-          <span class="listOthers">{{req.phone}}</span><br>
-        </div>
-      </div>
-    </div>
+      </md-card-content>
+    </md-card>
   </div>
-
 </p>

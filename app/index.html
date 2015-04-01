@@ -10,33 +10,43 @@
   <body layout="row" ng-controller="MainCtrl" ng-cloak>
 
     <md-sidenav md-is-locked-open="$mdMedia('gt-sm')" class="site-sidenav md-whiteframe-z2" md-component-id="left" ng-cloak="">
+
+      <md-toolbar class="md-primary" layout="row" layout-align="center center">
+        <div layout-padding>
+          <img ng-src="images/step.png" height="60" width="60">
+        </div>
+        <div layout-padding>
+          <h1 class="mainTitle" >Dashboard</h1>
+        </div>
+      </md-toolbar>
+
       <md-list layout="column" layout-align="center center">
         <md-item>
-          <md-button ng-click="go('/profile')">
+          <md-button ng-click="go('/profile', 'Profile')">
             <ng-md-icon class="avatar" icon="account_circle" size="48"></ng-md-icon>
             Hello, {{ username }}
           </md-button>
         </md-item>
         <md-item>
-          <md-button ng-click="go('/')">
+          <md-button ng-click="go('/', 'Home')">
             <ng-md-icon class="avatar" icon="home" size="48"></ng-md-icon>
             Dashboard Home
           </md-button>
         </md-item>
         <md-item>
-          <md-button ng-click="go('/requests')">
+          <md-button ng-click="go('/requests', 'Blood Requests')">
             <ng-md-icon class="avatar" icon="favorite" size="48"></ng-md-icon>
             Blood Requests
           </md-button>
         </md-item>
         <md-item>
-          <md-button ng-click="go('/donors')">
+          <md-button ng-click="go('/donors', 'Blood Donors')">
             <ng-md-icon class="avatar" icon="accessibility" size="48"></ng-md-icon>
             Blood Donors
           </md-button>
         </md-item>
         <md-item>
-          <md-button ng-click="go('/create-camp')">
+          <md-button ng-click="go('/create-camp', 'Create Camp')">
             <ng-md-icon class="avatar" icon="create" size="48"></ng-md-icon>
             Create Camp
           </md-button>
@@ -52,15 +62,15 @@
 
     <div layout="column" role="main" flex class="ground">
       <!-- Container #1 -->
-      <md-toolbar class="md-tall md-primary" layout="row" layout-align="center center">
+      <md-toolbar class="md-primary" layout="row" layout-align="start center">
         <md-button class="menu" hide-gt-sm ng-click="toggleSidebar()">
           <ng-md-icon icon="menu"></ng-md-icon>
         </md-button>
         <div layout-padding>
-          <img ng-src="images/step.png" height="100" width="100">
+          <ng-md-icon icon="keyboard_arrow_right" class="avatar"></ng-md-icon>
         </div>
-        <div layout-padding>
-          <h1 class="mainTitle" >Dashboard</h1>
+        <div>
+          <h1 class="mainTitle" >{{currentSection || 'Dashboard' }}</h1>
         </div>
       </md-toolbar>
 

@@ -7,17 +7,55 @@ redDashboard.controller('MainCtrl', [
   '$location', '$mdMedia', '$mdSidenav',
   function ($scope, $rootScope, $route, $routeParams,
             $location, $mdMedia, $mdSidenav) {
-    $scope.go = function (path) {
+    $scope.go = function (path, sectionName) {
       $location.url(path);
+      $scope.currentSection = sectionName;
 
       if ($mdMedia('sm')) {
         $scope.toggleSidebar();
       }
     };
 
+    // Dummy data
     $scope.username = 'John Doe';
-    $rootScope.bloodReqs = [];
-    $rootScope.donors = [];
+    $rootScope.bloodReqs = [
+      {
+        name: 'King Arthur',
+        email: 'arthur@kings.org',
+        phone: '7849523890',
+        address: 'Gondwana Land',
+        group: 'A+',
+        quantity: 2.5,
+        date: '05/12/2015'
+      },
+      {
+        name: 'Atila Di Hun',
+        email: 'atila@kings.org',
+        phone: '3563483473',
+        address: 'Palestine',
+        group: 'O+',
+        quantity: 0.5,
+        date: '06/19/2015'
+      }
+    ];
+    $rootScope.donors = [
+      {
+        name: 'King Arthur',
+        age: 27,
+        email: 'arthur@kings.org',
+        phone: '7464688434',
+        address: 'Gondwana Land',
+        group: 'A+'
+      },
+      {
+        name: 'Atila Di Hun',
+        age: 24,
+        email: 'atila@kings.org',
+        phone: '7823829823',
+        address: 'Palestine',
+        group: 'O+'
+      }
+    ];
 
     $scope.toggleSidebar = function () {
       $mdSidenav('left').toggle();
@@ -42,9 +80,19 @@ redDashboard.controller('ProfileCtrl', [
 ]);
 
 
+function DialogController($scope, $rootScope, $mdDialog) {
+  $scope.detail = $rootScope.detailView;
+  $scope.hide = function () {
+    $mdDialog.hide();
+  };
+  $scope.cancel = function () {
+    $mdDialog.cancel();
+  };
+}
+
 redDashboard.controller('RequestsCtrl', [
-  '$scope', '$rootScope', '$routeParams', '$http',
-  function ($scope, $rootScope, $routeParams, $http) {
+  '$scope', '$rootScope', '$routeParams', '$http', '$mdDialog',
+  function ($scope, $rootScope, $routeParams, $http, $mdDialog) {
     $scope.bloodReqs = $rootScope.bloodReqs;
     console.log('loading bloodreqs...');
 
@@ -57,13 +105,28 @@ redDashboard.controller('RequestsCtrl', [
       .error(function () {
         console.log('Error in requesting');
       });
+
+    $scope.detail = function (req) {
+      console.log('req is', req);
+      $rootScope.detailView = req;
+
+      $mdDialog.show({
+        controller: DialogController,
+        templateUrl: 'detailRequest.html'
+      })
+      .then(function (answer) {
+        
+      }, function () {
+        
+      });
+    };
   }
 ]);
 
 
 redDashboard.controller('DonorsCtrl', [
-  '$scope', '$rootScope', '$routeParams', '$http',
-  function ($scope, $rootScope, $routeParams, $http) {
+  '$scope', '$rootScope', '$routeParams', '$http', '$mdDialog',
+  function ($scope, $rootScope, $routeParams, $http, $mdDialog) {
     $scope.donors = $rootScope.donors;
     console.log('loading donors...');
 
@@ -76,6 +139,21 @@ redDashboard.controller('DonorsCtrl', [
       .error(function () {
         console.log('Error in requesting');
       });
+
+    $scope.detail = function (don) {
+      console.log('don is', don);
+      $rootScope.detailView = don;
+
+      $mdDialog.show({
+        controller: DialogController,
+        templateUrl: 'detailDonor.html'
+      })
+      .then(function () {
+      
+      }, function () {
+      
+      });
+    };
   }
 ]);
 

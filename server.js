@@ -8,8 +8,7 @@ var express = require('express'),
 
 var port = process.env.PORT || 3000; //port set to 3000
 
-var uristring = process.env.MONGODB_URI ||
-                'mongodb://stepindia:step000india@ds047008.mongolab.com:47008/step';
+var uristring = process.env.MONGODB_URI || '';
 
 mongoose.connect(uristring, function (err, res) {
   if (err) {
@@ -55,7 +54,6 @@ router.get('/', function (req, res) {
 });
 
 router.get('/bloodreqs', function (req, res) {
-  console.log('got a request for bloodreqs');
   BloodReq.find({}).exec(function (err, result) {
     if (!err) {
       console.log('got', result);

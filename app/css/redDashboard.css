@@ -15,7 +15,7 @@ ng-md-icon {
 }
 
 .mainTitle {
-  font-size: 1.8em;
+  font-size: 1.2em;
 }
 
 md-toolbar h1 {
@@ -72,4 +72,9 @@ md-toolbar h1 {
 
 .listOthers {
   font-size: 0.75em;
+}
+
+md-dialog {
+  heigth: 500px;
+  width: 500px;
 }

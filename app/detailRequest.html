@@ -1,0 +1,38 @@
+<md-dialog aria-label="Detail">
+  <md-content class="sticky-container">
+    <md-subheader class="md-sticky-no-effect">Detail</md-subheader>
+    <div class="dialog-content">
+      <div layout="row" layout-align="space-between center">
+        <div flex="55">
+          <ng-md-icon class="avatar" icon="person"></ng-md-icon>
+          <span class="listName">{{detail.name}}</span>
+        </div>
+        <div flex="45">
+          <ng-md-icon class="avatar" icon="lens"></ng-md-icon>
+          <span class="listOthers">{{detail.group}}</span>
+        </div>
+      </div>
+      <div layout="row" layout-align="space-between center">
+        <div flex="55">
+          <ng-md-icon class="avatar" icon="email"></ng-md-icon>
+          <span class="listOthers">{{detail.email}}</span>
+        </div>
+        <div flex="45">
+          <ng-md-icon class="avatar" icon="phone"></ng-md-icon>
+          <span class="listOthers">{{detail.phone}}</span><br>
+        </div>
+      </div>
+      <div layout="row" layout-align="space-between center">
+        <div flex="55">
+          <ng-md-icon class="avatar" icon="location_on"></ng-md-icon>
+          <span class="listOthers">{{detail.address}}</span><br>
+        </div>
+      </div>
+    </div>
+  </md-content>
+  <div class="md-actions" layout="row">
+    <md-button ng-click="cancel()">
+      Done
+    </md-button>
+  </div>
+</md-dialog>
