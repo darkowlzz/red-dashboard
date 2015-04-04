@@ -81,7 +81,6 @@ router.get('/donors', function (req, res) {
 });
 
 router.post('/request/done', function (req, res) {
-  console.log('got request for done');
   BloodReq.findOne({reqId: req.body.data.reqId }, function (err, aReq) {
     // set done value
     aReq.done = req.body.done;
@@ -90,7 +89,21 @@ router.post('/request/done', function (req, res) {
         console.log('error updating blood request');
         res.json({error: true});
       } else {
-        console.log('updated!');
+        res.json(obj);
+      }
+    });
+  });
+});
+
+router.post('/donor/done', function (req, res) {
+  Donor.findOne({donId: req.body.data.donId }, function (err, aDon) {
+    // set done value
+    aDon.done = req.body.done;
+    aDon.save(function (err, obj) {
+      if (err) {
+        console.log('error updating blood request');
+        res.json({error: true});
+      } else {
         res.json(obj);
       }
     });

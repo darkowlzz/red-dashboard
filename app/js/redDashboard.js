@@ -80,8 +80,7 @@ redDashboard.controller('ProfileCtrl', [
 ]);
 
 
-function DialogController ($scope, $rootScope, $mdDialog, requestDone,
-                           requestUndone) {
+function DialogController ($scope, $rootScope, $mdDialog, done, undone) {
   $scope.detail = $rootScope.detailView;
   $scope.hide = function () {
     $mdDialog.hide();
@@ -92,21 +91,28 @@ function DialogController ($scope, $rootScope, $mdDialog, requestDone,
   $scope.done = function (data) {
     if (! _.isUndefined(data.reqId)) {
       // it is blood request
-      //requestDone(data);
+      done('/request/done', data).then(function (resp) {
+        $mdDialog.hide(resp);
+      });
     } else {
       // it is blood donor
+      done('/donor/done', data).then(function (resp) {
+        $mdDialog.hide(resp);
+      });
     }
-    $mdDialog.hide();
-    // Add data update in a service and update here using the service
   };
   $scope.undone = function (data) {
     if (! _.isUndefined(data.reqId)) {
       // it is blood request
-      //requestUndone(data);
+      undone('/request/done', data).then(function (resp) {
+        $mdDialog.hide(resp);
+      });
     } else {
-      // it is blood donor 
+      // it is blood donor
+      undone('/donor/done', data).then(function (resp) {
+        $mdDialog.hide(resp);
+      });
     }
-    $mdDialog.hide();
   };
 }
 
@@ -126,10 +132,13 @@ redDashboard.controller('RequestsCtrl', [
         controller: DialogController,
         templateUrl: 'detailRequest.html'
       })
-      .then(function (answer) {
-        
+      .then(function (ans) {
+        // done / undone
+        var index = _.findIndex($scope.bloodReqs,
+                                _.matchesProperty('reqId', ans.reqId));
+        $rootScope.bloodReqs[index] = $scope.bloodReqs[index] = ans;
       }, function () {
-        
+        // cancelled
       });
     };
   }
@@ -152,10 +161,13 @@ redDashboard.controller('DonorsCtrl', [
         controller: DialogController,
         templateUrl: 'detailDonor.html'
       })
-      .then(function () {
-      
+      .then(function (ans) {
+        // done / undone
+        var index = _.findIndex($scope.donors,
+                                _.matchesProperty('donId', ans.donId));
+        $rootScope.donors[index] = $scope.donors[index] = ans;
       }, function () {
-      
+        // cancelled
       });
     };
   }
@@ -203,30 +215,28 @@ redDashboard.config(['$mdThemingProvider', '$routeProvider',
 }]);
 
 
-redDashboard.factory('requestDone', ['$http',
+redDashboard.factory('done', ['$http',
   function ($http) {
-    return function (bloodreq) {
-      $http.post('/request/done', { data: bloodreq, done: true })
-        .success(function (o) {
-
-        })
-        .error(function (err) {
-
-        });
+    return function (uri, data) {
+      var promise = $http.post(uri, {
+                      data: data, done: true
+                    }).then(function (resp) {
+                      return resp.data;
+                    });
+      return promise;
     }
   }
 ]);
 
-redDashboard.factory('requestUndone', ['$http',
+redDashboard.factory('undone', ['$http',
   function ($http) {
-    return function (bloodreq) {
-      $http.post('/request/done', { data: bloodreq, done: false })
-        .success(function (o) {
-
-        })
-        .error(function (err) {
-
-        });
+    return function (uri, data) {
+      var promise = $http.post(uri, {
+                      data: data, done: false
+                    }).then(function (resp) {
+                      return resp.data;
+                    });
+      return promise;
     }
   }
 ]);
