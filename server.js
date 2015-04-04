@@ -8,7 +8,7 @@ var express = require('express'),
 
 var port = process.env.PORT || 3000; //port set to 3000
 
-var uristring = process.env.MONGODB_URI || '';
+var uristring = process.env.MONGODB_URI || 'mongodb://localhost/step';
 
 mongoose.connect(uristring, function (err, res) {
   if (err) {
@@ -25,7 +25,9 @@ var reqSchema = new mongoose.Schema({
   address: { type: String },
   group: { type: String },
   quantity: { type: Number },
-  reqOn: { type: String }
+  reqOn: { type: String },
+  reqId: { type: Number },
+  done: { type: Boolean }
 });
 var BloodReq = mongoose.model('bloodreqs', reqSchema);
 
@@ -35,7 +37,9 @@ var donorSchema = new mongoose.Schema({
   email: { type: String },
   phone: { type: String },
   address: { type: String },
-  group: { type: String }
+  group: { type: String },
+  donId: { type: Number },
+  done: { type: Boolean }
 });
 var Donor = mongoose.model('donors', donorSchema);
 
@@ -73,6 +77,23 @@ router.get('/donors', function (req, res) {
       console.log('Error retrieving data');
       res.json({ Error: 'failed to retrieve data' });
     }
+  });
+});
+
+router.post('/request/done', function (req, res) {
+  console.log('got request for done');
+  BloodReq.findOne({reqId: req.body.data.reqId }, function (err, aReq) {
+    // set done value
+    aReq.done = req.body.done;
+    aReq.save(function (err, obj) {
+      if (err) {
+        console.log('error updating blood request');
+        res.json({error: true});
+      } else {
+        console.log('updated!');
+        res.json(obj);
+      }
+    });
   });
 });
 

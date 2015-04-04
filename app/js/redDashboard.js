@@ -80,7 +80,8 @@ redDashboard.controller('ProfileCtrl', [
 ]);
 
 
-function DialogController($scope, $rootScope, $mdDialog) {
+function DialogController ($scope, $rootScope, $mdDialog, requestDone,
+                           requestUndone) {
   $scope.detail = $rootScope.detailView;
   $scope.hide = function () {
     $mdDialog.hide();
@@ -88,26 +89,37 @@ function DialogController($scope, $rootScope, $mdDialog) {
   $scope.cancel = function () {
     $mdDialog.cancel();
   };
+  $scope.done = function (data) {
+    if (! _.isUndefined(data.reqId)) {
+      // it is blood request
+      //requestDone(data);
+    } else {
+      // it is blood donor
+    }
+    $mdDialog.hide();
+    // Add data update in a service and update here using the service
+  };
+  $scope.undone = function (data) {
+    if (! _.isUndefined(data.reqId)) {
+      // it is blood request
+      //requestUndone(data);
+    } else {
+      // it is blood donor 
+    }
+    $mdDialog.hide();
+  };
 }
 
 redDashboard.controller('RequestsCtrl', [
-  '$scope', '$rootScope', '$routeParams', '$http', '$mdDialog',
-  function ($scope, $rootScope, $routeParams, $http, $mdDialog) {
+  '$scope', '$rootScope', '$routeParams', '$http', '$mdDialog', 'getList',
+  function ($scope, $rootScope, $routeParams, $http, $mdDialog, getList) {
     $scope.bloodReqs = $rootScope.bloodReqs;
-    console.log('loading bloodreqs...');
 
-    $http.get('/bloodreqs')
-      .success(function (data, status, headers, config) {
-        console.log('ng, got data', data);
-        $rootScope.bloodReqs = data;
-        $scope.bloodReqs = data;
-      })
-      .error(function () {
-        console.log('Error in requesting');
-      });
+    getList('/bloodreqs').then(function (data) {
+      $rootScope.bloodReqs = $scope.bloodReqs = data;
+    });
 
     $scope.detail = function (req) {
-      console.log('req is', req);
       $rootScope.detailView = req;
 
       $mdDialog.show({
@@ -125,23 +137,15 @@ redDashboard.controller('RequestsCtrl', [
 
 
 redDashboard.controller('DonorsCtrl', [
-  '$scope', '$rootScope', '$routeParams', '$http', '$mdDialog',
-  function ($scope, $rootScope, $routeParams, $http, $mdDialog) {
+  '$scope', '$rootScope', '$routeParams', '$http', '$mdDialog', 'getList',
+  function ($scope, $rootScope, $routeParams, $http, $mdDialog, getList) {
     $scope.donors = $rootScope.donors;
-    console.log('loading donors...');
 
-    $http.get('/donors')
-      .success(function (data) {
-        console.log('ng, got data', data);
-        $rootScope.donors = data;
-        $scope.donors = data;
-      })
-      .error(function () {
-        console.log('Error in requesting');
-      });
+    getList('/donors').then(function (data) {
+      $rootScope.donors = $scope.donors = data;
+    });
 
     $scope.detail = function (don) {
-      console.log('don is', don);
       $rootScope.detailView = don;
 
       $mdDialog.show({
@@ -196,4 +200,42 @@ redDashboard.config(['$mdThemingProvider', '$routeProvider',
       .otherwise({
         redirectTo: '/'
       });
+}]);
+
+
+redDashboard.factory('requestDone', ['$http',
+  function ($http) {
+    return function (bloodreq) {
+      $http.post('/request/done', { data: bloodreq, done: true })
+        .success(function (o) {
+
+        })
+        .error(function (err) {
+
+        });
+    }
+  }
+]);
+
+redDashboard.factory('requestUndone', ['$http',
+  function ($http) {
+    return function (bloodreq) {
+      $http.post('/request/done', { data: bloodreq, done: false })
+        .success(function (o) {
+
+        })
+        .error(function (err) {
+
+        });
+    }
+  }
+]);
+
+redDashboard.factory('getList', ['$http', function ($http) {
+  return function (uri) {
+    var promise = $http.get(uri).then(function (resp) {
+      return resp.data;
+    });
+    return promise;
+  };
 }]);
