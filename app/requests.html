@@ -1,7 +1,26 @@
 <p>
+  <h3>Undone</h3>
   <div layout="column" layout-margin>
     <md-card ng-repeat="req in bloodReqs">
-      <md-card-content ng-click="detail(req)">
+      <md-card-content ng-click="detail(req, 'undone')">
+        <div layout="row" layout-align="space-between center">
+          <div flex="55">
+            <ng-md-icon class="avatar" icon="person"></ng-md-icon>
+            <span class="listName">{{req.name}}</span>
+          </div>
+          <div flex="45">
+            <ng-md-icon class="avatar" icon="lens"></ng-md-icon>
+            <span class="listOthers">{{req.group}}</span>
+          </div>
+        </div>
+      </md-card-content>
+    </md-card>
+  </div>
+  <hr>
+  <h3>Done</h3>
+  <div layout="column" layout-margin>
+    <md-card ng-repeat="req in reqsDone">
+      <md-card-content ng-click="detail(req, 'done')">
         <div layout="row" layout-align="space-between center">
           <div flex="55">
             <ng-md-icon class="avatar" icon="person"></ng-md-icon>
