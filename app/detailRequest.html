@@ -2,23 +2,29 @@
   <md-content class="sticky-container">
     <md-subheader class="md-sticky-no-effect">Blood Request</md-subheader>
     <div class="dialog-content">
-      <div layout="row" layout-align="space-between center">
-        <div flex="55">
+      <div layout="row" layout-sm="column" layout-align="space-between center" layout-align-sm="space-between start">
+        <div flex>
           <ng-md-icon class="avatar" icon="person"></ng-md-icon>
           <span class="listName">{{detail.name}}</span>
         </div>
-        <div flex="45">
+        <div flex>
           <ng-md-icon class="avatar" icon="lens"></ng-md-icon>
           <span class="listOthers">{{detail.group}}</span>
         </div>
       </div>
-      <div>
-        <ng-md-icon class="avatar" icon="email"></ng-md-icon>
-        <span class="listOthers">{{detail.email}}</span>
-      </div>
-      <div>
-        <ng-md-icon class="avatar" icon="phone"></ng-md-icon>
-        <span class="listOthers">{{detail.phone}}</span><br>
+      <div layout="row" layout-sm="column" layout-align="space-between center" layout-align-sm="space-between start">
+        <div flex>
+          <ng-md-icon class="avatar" icon="email"></ng-md-icon>
+          <span class="listOthers">
+            <a href="mailto:{{detail.email}}">{{detail.email}}</a>
+          </span>
+        </div>
+        <div flex>
+          <ng-md-icon class="avatar" icon="phone"></ng-md-icon>
+          <span class="listOthers">
+            <a href="tel:{{detail.phone}}">{{detail.phone}}</a>
+          </span>
+        </div>
       </div>
       <div>
         <ng-md-icon class="avatar" icon="location_on"></ng-md-icon>
