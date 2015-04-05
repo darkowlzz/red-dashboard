@@ -1,0 +1,60 @@
+<div layout="column">
+  <md-content class="md-padding" ng-hide="submitted">
+    <h2>Create new camp</h2>
+    <form name="campForm">
+      <div layout="column" layout-gt-md="row">
+        <md-input-container flex>
+          <label>Title</label>
+          <input required name="title" ng-model="camp.title" placeholder="Blood Donation Camp">
+          <div ng-messages="campForm.title.$error">
+            <div ng-message="required">Title is required.</div>
+          </div>
+        </md-input-container>
+        <md-input-container flex>
+          <label>Location</label>
+          <input required name="location" ng-model="camp.location" placeholder="Nowhere">
+          <div ng-messages="campForm.location.$error">
+            <div ng-message="required">Location is required.</div>
+          </div>
+        </md-input-container>
+      </div>
+      <div layout="column" layout-gt-md="row">
+        <md-input-container flex>
+          <label>Organizer</label>
+          <input required name="organizer" ng-model="camp.organizer" placeholder="Foo Org">
+          <div ng-messages="campForm.organizer.$error">
+            <div ng-message="required">Organizer is required.</div>
+          </div>
+        </md-input-container>
+        <md-input-container flex>
+          <label>Contact Number</label>
+          <input required name="contact" type="tel" ng-model="camp.contact" placeholder="1234567890">
+          <div ng-messages="campForm.contact.$error">
+            <div ng-message="required">Contact number is required.</div>
+          </div>
+        </md-input-container>
+      </div>
+      <md-input-container>
+        <label>Date</label>
+        <input required name="date" ng-model="camp.date" placeholder>
+        <div ng-messages="campForm.date.$error">
+          <div ng-message="required">Date is required.</div>
+        </div>
+      </md-input-container>
+    </form>
+    <section layout="column" layout-align="center center">
+      <md-button ng-click="submit()" ng-hide="loading" class="md-raised md-accent" aria-label="Create camp">
+        Create Camp
+      </md-button>
+      <div ng-show="error" class="formError">
+        <ng-md-icon icon="error" class="avatar" style="fill:red" size="20"></ng-md-icon>
+        <span>The form is incomplete</span>
+      </div>
+      <md-progress-circular ng-show="loading" class="md-hue-2" md-mode="indeterminate"></md-progress-circular>
+    </section>
+  </md-content>
+  <div ng-show="submitted">
+    <p>Camp created!</p>
+  </div>
+</div>
+

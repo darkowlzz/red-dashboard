@@ -207,9 +207,38 @@ redDashboard.controller('DonorsCtrl', [
 
 
 redDashboard.controller('CreateCampCtrl', [
-  '$scope', '$routeParams',
-  function ($scope, $routeParams) {
+  '$scope', '$routeParams', 'submitCamp',
+  function ($scope, $routeParams, submitCamp) {
+    $scope.camp = {};
+    $scope.loading = false;
+    $scope.submitted = false;
+    $scope.error = false;
 
+    $scope.submit = function () {
+      var result = validate($scope.camp);
+
+      if (result) {
+        $scope.error = false;
+        $scope.loading = true;
+
+        submitCamp('/camp/new', $scope.camp).then(function (resp) {
+          $scope.loading = false;
+          $scope.submitted = true;
+        });
+      } else {
+        $scope.error = true;
+      }
+    }
+
+    function validate (data) {
+      var result = true;
+      if (_.isEmpty(data.title) && _.isEmpty(data.location) &&
+          _.isEmpty(data.organizer) && _.isEmpty(data.contact) &&
+          _.isEmpty(data.date)) {
+        result = false;
+      }
+      return result;
+    }
   }
 ]);
 
@@ -218,7 +247,7 @@ redDashboard.config(['$mdThemingProvider', '$routeProvider',
   function($mdThemingProvider, $routeProvider) {
     $mdThemingProvider.theme('default')
       .primaryPalette('indigo')
-      .accentPalette('blue');
+      .accentPalette('pink');
 
     $routeProvider
       .when('/', {
@@ -238,7 +267,7 @@ redDashboard.config(['$mdThemingProvider', '$routeProvider',
         controller: 'DonorsCtrl'
       })
       .when('/create-camp', {
-        templateUrl: 'create-camp.html',
+        templateUrl: 'camp.html',
         controller: 'CreateCampCtrl'
       })
       .otherwise({
@@ -278,6 +307,15 @@ redDashboard.factory('getList', ['$http', function ($http) {
     var promise = $http.get(uri).then(function (resp) {
       return resp.data;
     });
+    return promise;
+  };
+}]);
+
+redDashboard.factory('submitCamp', ['$http', function ($http) {
+  return function (uri, data) {
+    var promise = $http.post(uri, data).then(function (resp) {
+                    return resp.data;
+                  });
     return promise;
   };
 }]);

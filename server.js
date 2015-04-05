@@ -43,6 +43,22 @@ var donorSchema = new mongoose.Schema({
 });
 var Donor = mongoose.model('donors', donorSchema);
 
+var campSchema = new mongoose.Schema({
+  title: { type: String },
+  location: { type: String },
+  date: { type: String },
+  organizer: { type: String },
+  contact: { type: String },
+  id: { type: Number }
+});
+var Camp = mongoose.model('camps', campSchema);
+
+var statusSchema = new mongoose.Schema({
+  name: { type: String },
+  count: { type: Number }
+});
+var Status = mongoose.model('status', statusSchema);
+
 //app specific configurations
 //==================================================
 
@@ -60,7 +76,6 @@ router.get('/', function (req, res) {
 router.get('/bloodreqs', function (req, res) {
   BloodReq.find({}).exec(function (err, result) {
     if (!err) {
-      console.log('got', result);
       res.json(result);
     } else {
       console.log('Error retrieving data');
@@ -105,6 +120,36 @@ router.post('/donor/done', function (req, res) {
         res.json({error: true});
       } else {
         res.json(obj);
+      }
+    });
+  });
+});
+
+router.post('/camp/new', function (req, res) {
+  console.log('received', req.body);
+  var aCamp = new Camp({
+    title: req.body.title || '',
+    location: req.body.location || '',
+    date: req.body.date || '',
+    organizer: req.body.organizer || '',
+    contact: req.body.contact || ''
+  });
+
+  Status.findOne({name: 'camps'}, function (err, stat) {
+    aCamp.id = stat.count + 1;
+    stat.count = aCamp.id;
+    stat.save(function (err) {
+      if (err) {
+        console.log('error in updating');
+      } else {
+        aCamp.save(function (err, obj) {
+          if (err) {
+            console.log('Error on save!');
+          } else {
+            console.log('Saving', obj);
+            res.json(obj);
+          }
+        });
       }
     });
   });
