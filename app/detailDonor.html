@@ -31,14 +31,17 @@
     </div>
   </md-content>
   <div class="md-actions" layout="row">
-    <md-button ng-click="cancel()">
-      Close
-    </md-button>
-    <md-button ng-hide="detail.done" ng-click="done(detail)">
-      Done
-    </md-button>
-    <md-button ng-show="detail.done" ng-click="undone(detail)">
-      Mark UnDone
-    </md-button>
+    <md-progress-circular ng-show="loading" class="md-warn" md-mode="indeterminate"></md-progress-circular>
+    <div ng-hide="loading">
+      <md-button ng-click="cancel()">
+        Close
+      </md-button>
+      <md-button ng-hide="detail.done" ng-click="done(detail)">
+        Done
+      </md-button>
+      <md-button ng-show="detail.done" ng-click="undone(detail)">
+        Mark UnDone
+      </md-button>
+    </div>
   </div>
 </md-dialog>

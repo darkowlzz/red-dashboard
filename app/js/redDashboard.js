@@ -84,6 +84,7 @@ redDashboard.controller('ProfileCtrl', [
 
 function DialogController ($scope, $rootScope, $mdDialog, done, undone) {
   $scope.detail = $rootScope.detailView;
+  $scope.loading = false;
   $scope.hide = function () {
     $mdDialog.hide();
   };
@@ -91,28 +92,34 @@ function DialogController ($scope, $rootScope, $mdDialog, done, undone) {
     $mdDialog.cancel();
   };
   $scope.done = function (data) {
+    $scope.loading = true;
     if (! _.isUndefined(data.reqId)) {
       // it is blood request
       done('/request/done', data).then(function (resp) {
         $mdDialog.hide(resp);
+        $scope.loading = false;
       });
     } else {
       // it is blood donor
       done('/donor/done', data).then(function (resp) {
         $mdDialog.hide(resp);
+        $scope.loading = false;
       });
     }
   };
   $scope.undone = function (data) {
+    $scope.loading = true;
     if (! _.isUndefined(data.reqId)) {
       // it is blood request
       undone('/request/done', data).then(function (resp) {
         $mdDialog.hide(resp);
+        $scope.loading = false;
       });
     } else {
       // it is blood donor
       undone('/donor/done', data).then(function (resp) {
         $mdDialog.hide(resp);
+        $scope.loading = false;
       });
     }
   };
