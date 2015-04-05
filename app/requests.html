@@ -1,4 +1,9 @@
 <p>
+  <div ng-show="loading" layout="column" layout-align="space-between center">
+    <span>loading...</span>
+    <md-progress-circular class="md-warn" md-mode="indeterminate"></md-progress-circular>
+  </div>
+
   <h3>Undone</h3>
   <div layout="column" layout-margin>
     <md-card ng-repeat="req in bloodReqs">

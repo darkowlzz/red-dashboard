@@ -18,45 +18,9 @@ redDashboard.controller('MainCtrl', [
 
     // Dummy data
     $scope.username = 'John Doe';
-    $rootScope.bloodReqs = [
-      {
-        name: 'King Arthur',
-        email: 'arthur@kings.org',
-        phone: '7849523890',
-        address: 'Gondwana Land',
-        group: 'A+',
-        quantity: 2.5,
-        date: '05/12/2015'
-      },
-      {
-        name: 'Atila Di Hun',
-        email: 'atila@kings.org',
-        phone: '3563483473',
-        address: 'Palestine',
-        group: 'O+',
-        quantity: 0.5,
-        date: '06/19/2015'
-      }
-    ];
+    $rootScope.bloodReqs = [];
     $rootScope.reqsDone = [];
-    $rootScope.donors = [
-      {
-        name: 'King Arthur',
-        age: 27,
-        email: 'arthur@kings.org',
-        phone: '7464688434',
-        address: 'Gondwana Land',
-        group: 'A+'
-      },
-      {
-        name: 'Atila Di Hun',
-        age: 24,
-        email: 'atila@kings.org',
-        phone: '7823829823',
-        address: 'Palestine',
-        group: 'O+'
-      }
-    ];
+    $rootScope.donors = [];
     $rootScope.donorsDone = [];
 
     $scope.toggleSidebar = function () {
@@ -130,6 +94,7 @@ redDashboard.controller('RequestsCtrl', [
   function ($scope, $rootScope, $routeParams, $http, $mdDialog, getList) {
     $scope.bloodReqs = $rootScope.bloodReqs;
     $scope.reqsDone = $rootScope.reqsDone;
+    $scope.loading = true;
     var index, elem, removed;
 
     // Get blood request list
@@ -143,6 +108,7 @@ redDashboard.controller('RequestsCtrl', [
       }
       $rootScope.bloodReqs = $scope.bloodReqs = data;
       $rootScope.reqsDone = $scope.reqsDone;
+      $scope.loading = false;
     });
 
     // Initiate detail view of a list item
@@ -187,6 +153,7 @@ redDashboard.controller('DonorsCtrl', [
   function ($scope, $rootScope, $routeParams, $http, $mdDialog, getList) {
     $scope.donors = $rootScope.donors;
     $scope.donorsDone = $rootScope.donorsDone;
+    $scope.loading = true;
     var index, elem, removed;
 
     getList('/donors').then(function (data) {
@@ -199,6 +166,7 @@ redDashboard.controller('DonorsCtrl', [
       }
       $rootScope.donors = $scope.donors = data;
       $rootScope.donorsDone = $scope.donorsDone;
+      $scope.loading = false;
     });
 
     // Initiate detail view of a list item
