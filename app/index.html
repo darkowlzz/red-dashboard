@@ -10,7 +10,7 @@
 
   <body layout="row" ng-controller="MainCtrl" ng-cloak>
 
-    <md-sidenav md-is-locked-open="$mdMedia('gt-sm')" class="site-sidenav md-whiteframe-z2" md-component-id="left" ng-cloak="">
+    <md-sidenav md-swipe-left="sidebarClose()" md-is-locked-open="$mdMedia('gt-sm')" class="site-sidenav md-whiteframe-z2" md-component-id="left" ng-cloak="">
 
       <md-toolbar class="md-primary" layout="row" layout-align="center center">
         <div layout-padding>
@@ -75,7 +75,8 @@
         </div>
       </md-toolbar>
 
-      <md-content ng-view md-scroll-y flex class="md-padding"></md-content>
+      <md-content md-swipe-right="sidebarOpen()" ng-view md-scroll-y flex class="md-padding">
+      </md-content>
 
     </div>
 

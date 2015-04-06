@@ -2,11 +2,24 @@ var redDashboard = angular.module('redDashboard', [
                               'ngRoute', 'ngMaterial', 'ngMdIcons'
                               ]);
 
+
+// Controllers
+// ============================================================
+
 redDashboard.controller('MainCtrl', [
   '$scope', '$rootScope', '$route', '$routeParams',
   '$location', '$mdMedia', '$mdSidenav',
   function ($scope, $rootScope, $route, $routeParams,
             $location, $mdMedia, $mdSidenav) {
+
+    /**
+     * Goes to the given path
+     *
+     * @param {String} path
+     *    Navigation path, applied to the page url.
+     * @param {String} sectionName
+     *    Title of the Nav section, used in the page header.
+     */
     $scope.go = function (path, sectionName) {
       $location.url(path);
       $scope.currentSection = sectionName;
@@ -23,13 +36,27 @@ redDashboard.controller('MainCtrl', [
     $rootScope.donors = [];
     $rootScope.donorsDone = [];
 
+    // Toggle open/close sidenav bar
     $scope.toggleSidebar = function () {
       $mdSidenav('left').toggle();
+    };
+
+    // Open sidenav bar
+    $scope.sidebarOpen = function () {
+      $mdSidenav('left').open();
+    };
+
+    // Close sidenav bar
+    $scope.sidebarClose = function () {
+      $mdSidenav('left').close();
     };
   }
 ]);
 
 
+/**
+ * Dashboard Controller
+ */
 redDashboard.controller('DashboardCtrl', [
   '$scope', '$routeParams',
   function ($scope, $routeParams) {
@@ -38,6 +65,9 @@ redDashboard.controller('DashboardCtrl', [
 ]);
 
 
+/**
+ * Profile Controller
+ */
 redDashboard.controller('ProfileCtrl', [
   '$scope', '$routeParams',
   function ($scope, $routeParams) {
@@ -46,15 +76,29 @@ redDashboard.controller('ProfileCtrl', [
 ]);
 
 
+/**
+ * Dialog box Controller for Detail Views.
+ */
 function DialogController ($scope, $rootScope, $mdDialog, done, undone) {
   $scope.detail = $rootScope.detailView;
   $scope.loading = false;
+
+  // Hide the dialog box
   $scope.hide = function () {
     $mdDialog.hide();
   };
+
+  // Cancel the dialog box
   $scope.cancel = function () {
     $mdDialog.cancel();
   };
+
+  /**
+   * Done option in the dialog box
+   *
+   * @param {Object} data
+   *    An object containing item data to be made DONE.
+   */
   $scope.done = function (data) {
     $scope.loading = true;
     if (! _.isUndefined(data.reqId)) {
@@ -71,6 +115,13 @@ function DialogController ($scope, $rootScope, $mdDialog, done, undone) {
       });
     }
   };
+
+  /**
+   * Undone option in the dialog box
+   *
+   * @param {Object} data
+   *    An object containing item data to be made UNDONE.
+   */
   $scope.undone = function (data) {
     $scope.loading = true;
     if (! _.isUndefined(data.reqId)) {
@@ -89,6 +140,10 @@ function DialogController ($scope, $rootScope, $mdDialog, done, undone) {
   };
 }
 
+
+/**
+ * Requests Controller
+ */
 redDashboard.controller('RequestsCtrl', [
   '$scope', '$rootScope', '$routeParams', '$http', '$mdDialog', 'getList',
   function ($scope, $rootScope, $routeParams, $http, $mdDialog, getList) {
@@ -148,6 +203,9 @@ redDashboard.controller('RequestsCtrl', [
 ]);
 
 
+/**
+ * Donors Controller
+ */
 redDashboard.controller('DonorsCtrl', [
   '$scope', '$rootScope', '$routeParams', '$http', '$mdDialog', 'getList',
   function ($scope, $rootScope, $routeParams, $http, $mdDialog, getList) {
@@ -156,6 +214,7 @@ redDashboard.controller('DonorsCtrl', [
     $scope.loading = true;
     var index, elem, removed;
 
+    // Update, check for any new data and fetch if available.
     getList('/donors').then(function (data) {
       $scope.donors = $scope.donorsDone = [];
       index = _.findIndex(data, _.matchesProperty('done', true));
@@ -206,6 +265,9 @@ redDashboard.controller('DonorsCtrl', [
 ]);
 
 
+/**
+ * Create Camp Controller
+ */
 redDashboard.controller('CreateCampCtrl', [
   '$scope', '$routeParams', 'submitCamp',
   function ($scope, $routeParams, submitCamp) {
@@ -214,6 +276,7 @@ redDashboard.controller('CreateCampCtrl', [
     $scope.submitted = false;
     $scope.error = false;
 
+    // Handle form submit
     $scope.submit = function () {
       var result = validate($scope.camp);
 
@@ -221,6 +284,7 @@ redDashboard.controller('CreateCampCtrl', [
         $scope.error = false;
         $scope.loading = true;
 
+        // Submit the form data
         submitCamp('/camp/new', $scope.camp).then(function (resp) {
           $scope.loading = false;
           $scope.submitted = true;
@@ -230,6 +294,8 @@ redDashboard.controller('CreateCampCtrl', [
       }
     }
 
+    // Validate the form data
+    // FIXME: Need improvement
     function validate (data) {
       var result = true;
       if (_.isEmpty(data.title) && _.isEmpty(data.location) &&
@@ -243,12 +309,16 @@ redDashboard.controller('CreateCampCtrl', [
 ]);
 
 
+// Module configuration
 redDashboard.config(['$mdThemingProvider', '$routeProvider',
   function($mdThemingProvider, $routeProvider) {
+
+    // Define theme
     $mdThemingProvider.theme('default')
       .primaryPalette('indigo')
       .accentPalette('pink');
 
+    // Define routes
     $routeProvider
       .when('/', {
         templateUrl: 'dashboard.html',
@@ -276,6 +346,19 @@ redDashboard.config(['$mdThemingProvider', '$routeProvider',
 }]);
 
 
+// Services
+// =================================================
+
+/**
+ * done service to set `done` value to true for donors or requests.
+ *
+ * @param {String} uri
+ *    A valid target uri where the data is stored.
+ *
+ * @param {Object} data
+ *    Data of the document to be changed, used for correct identification
+ *    of the document.
+ */
 redDashboard.factory('done', ['$http',
   function ($http) {
     return function (uri, data) {
@@ -289,6 +372,17 @@ redDashboard.factory('done', ['$http',
   }
 ]);
 
+
+/**
+ * undone service to set `done` value to false for donors or requests.
+ *
+ * @param {String} uri
+ *    A valid target uri where the data is stored.
+ *
+ * @param {Object} data
+ *    Data of the document to be changed, used for correct identifiaction
+ *    of the document.
+ */
 redDashboard.factory('undone', ['$http',
   function ($http) {
     return function (uri, data) {
@@ -302,6 +396,17 @@ redDashboard.factory('undone', ['$http',
   }
 ]);
 
+
+/**
+ * getList service to fetch the list of items from donors or requests.
+ *
+ * @param {String} uri
+ *    Target uri to fetch the data.
+ *
+ * @return {Promise}
+ *    Returns a promise which is completed when the whole of the requested
+ *    data is fetched.
+ */
 redDashboard.factory('getList', ['$http', function ($http) {
   return function (uri) {
     var promise = $http.get(uri).then(function (resp) {
@@ -311,6 +416,19 @@ redDashboard.factory('getList', ['$http', function ($http) {
   };
 }]);
 
+
+/**
+ * submitCamp service to submit new camp data.
+ *
+ * @param {String} uri
+ *    Target uri to submit the data.
+ *
+ * @param {Object} data
+ *    Camp detailed data to be submitted.
+ *
+ * @return {Promise}
+ *    Returns a promise which is completed when the data is submitted.
+ */
 redDashboard.factory('submitCamp', ['$http', function ($http) {
   return function (uri, data) {
     var promise = $http.post(uri, data).then(function (resp) {
