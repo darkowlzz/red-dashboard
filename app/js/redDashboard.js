@@ -171,7 +171,7 @@ redDashboard.controller('RequestsCtrl', [
       $rootScope.detailView = req;
       $mdDialog.show({
         controller: DialogController,
-        templateUrl: 'detailRequest.html'
+        templateUrl: 'templates/detailRequest.html'
       })
       .then(function (ans) {
         // done / undone
@@ -233,7 +233,7 @@ redDashboard.controller('DonorsCtrl', [
       $rootScope.detailView = don;
       $mdDialog.show({
         controller: DialogController,
-        templateUrl: 'detailDonor.html'
+        templateUrl: 'templates/detailDonor.html'
       })
       .then(function (ans) {
         // done / undone
@@ -321,23 +321,23 @@ redDashboard.config(['$mdThemingProvider', '$routeProvider',
     // Define routes
     $routeProvider
       .when('/', {
-        templateUrl: 'dashboard.html',
+        templateUrl: 'templates/dashboard.html',
         controller: 'DashboardCtrl'
       })
       .when('/profile', {
-        templateUrl: 'profile.html',
+        templateUrl: 'templates/profile.html',
         controller: 'ProfileCtrl'
       })
       .when('/requests', {
-        templateUrl: 'requests.html',
+        templateUrl: 'templates/requests.html',
         controller: 'RequestsCtrl'
       })
       .when('/donors', {
-        templateUrl: 'donors.html',
+        templateUrl: 'templates/donors.html',
         controller: 'DonorsCtrl'
       })
       .when('/create-camp', {
-        templateUrl: 'camp.html',
+        templateUrl: 'templates/camp.html',
         controller: 'CreateCampCtrl'
       })
       .otherwise({
