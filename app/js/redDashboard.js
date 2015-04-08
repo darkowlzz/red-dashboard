@@ -35,6 +35,8 @@ redDashboard.controller('MainCtrl', [
     $rootScope.reqsDone = [];
     $rootScope.donors = [];
     $rootScope.donorsDone = [];
+    $rootScope.camps = [];
+    $rootScope.campsDone = [];
 
     // Toggle open/close sidenav bar
     $scope.toggleSidebar = function () {
@@ -99,17 +101,22 @@ function DialogController ($scope, $rootScope, $mdDialog, done, undone) {
    * @param {Object} data
    *    An object containing item data to be made DONE.
    */
-  $scope.done = function (data) {
+  $scope.done = function (data, context) {
     $scope.loading = true;
-    if (! _.isUndefined(data.reqId)) {
+    if (context == 'request') {
       // it is blood request
       done('/request/done', data).then(function (resp) {
         $mdDialog.hide(resp);
         $scope.loading = false;
       });
-    } else {
+    } else if (context == 'donor') {
       // it is blood donor
       done('/donor/done', data).then(function (resp) {
+        $mdDialog.hide(resp);
+        $scope.loading = false;
+      });
+    } else if (context == 'camp') {
+      done('/camp/done', data).then(function (resp) {
         $mdDialog.hide(resp);
         $scope.loading = false;
       });
@@ -122,20 +129,25 @@ function DialogController ($scope, $rootScope, $mdDialog, done, undone) {
    * @param {Object} data
    *    An object containing item data to be made UNDONE.
    */
-  $scope.undone = function (data) {
+  $scope.undone = function (data, context) {
     $scope.loading = true;
-    if (! _.isUndefined(data.reqId)) {
+    if (context == 'request') {
       // it is blood request
       undone('/request/done', data).then(function (resp) {
         $mdDialog.hide(resp);
         $scope.loading = false;
       });
-    } else {
+    } else if (context == 'donor') {
       // it is blood donor
       undone('/donor/done', data).then(function (resp) {
         $mdDialog.hide(resp);
         $scope.loading = false;
       });
+    } else if (context == 'camp') {
+      undone('/camp/done', data).then(function (resp) {
+        $mdDialog.hide(resp);
+        $scope.loading = false;
+      })
     }
   };
 }
@@ -146,7 +158,9 @@ function DialogController ($scope, $rootScope, $mdDialog, done, undone) {
  */
 redDashboard.controller('RequestsCtrl', [
   '$scope', '$rootScope', '$routeParams', '$http', '$mdDialog', 'getList',
-  function ($scope, $rootScope, $routeParams, $http, $mdDialog, getList) {
+  'segregateData', 'orgDoneData', 'applyDetailChange',
+  function ($scope, $rootScope, $routeParams, $http, $mdDialog, getList,
+            segregateData, orgDoneData, applyDetailChange) {
     $scope.bloodReqs = $rootScope.bloodReqs;
     $scope.reqsDone = $rootScope.reqsDone;
     $scope.loading = true;
@@ -154,15 +168,9 @@ redDashboard.controller('RequestsCtrl', [
 
     // Get blood request list
     getList('/bloodreqs').then(function (data) {
-      $scope.bloodReqs = $scope.reqsDone = [];
-      index = _.findIndex(data, _.matchesProperty('done', true));
-      while (index > -1) {
-        elem = data.splice(index, 1);
-        $scope.reqsDone.push(elem[0]);
-        index = _.findIndex(data, _.matchesProperty('done', true));
-      }
-      $rootScope.bloodReqs = $scope.bloodReqs = data;
-      $rootScope.reqsDone = $scope.reqsDone;
+      _.assign($scope, orgDoneData(segregateData(data), 'bloodreqs'));
+      _.assign($rootScope, { bloodReqs: $scope.bloodReqs,
+                             reqsDone: $scope.reqsDone });
       $scope.loading = false;
     });
 
@@ -174,27 +182,12 @@ redDashboard.controller('RequestsCtrl', [
         templateUrl: 'templates/detailRequest.html'
       })
       .then(function (ans) {
-        // done / undone
-        if (type == 'undone') {
-          index = _.findIndex($scope.bloodReqs,
-                              _.matchesProperty('reqId', ans.reqId));
-          $rootScope.bloodReqs[index] = $scope.bloodReqs[index] = ans;
-        } else if (type == 'done') {
-          index = _.findIndex($scope.reqsDone,
-                              _.matchesProperty('reqId', ans.reqId));
-          $rootScope.reqsDone[index] = $scope.reqsDone[index] = ans;
-        }
-        if (ans.done) {
-          removed = $scope.bloodReqs.splice(index, 1);
-          $rootScope.bloodReqs = $scope.bloodReqs;
-          $scope.reqsDone.push(removed[0]);
-          $rootScope.reqsDone = $scope.reqsDone;
-        } else {
-          removed = $scope.reqsDone.splice(index, 1);
-          $rootScope.reqsDone = $scope.reqsDone;
-          $scope.bloodReqs.push(removed[0]);
-          $rootScope.bloodReqs = $scope.bloodReqs;
-        }
+        // organize done & undone
+        _.assign($scope, orgDoneData(
+          applyDetailChange(type, ans, $scope.bloodReqs, $scope.reqsDone),
+          'bloodreqs'));
+        _.assign($rootScope, { bloodReqs: $scope.bloodReqs,
+                               reqsDone: $scope.reqsDone });
       }, function () {
         // cancelled
       });
@@ -208,7 +201,9 @@ redDashboard.controller('RequestsCtrl', [
  */
 redDashboard.controller('DonorsCtrl', [
   '$scope', '$rootScope', '$routeParams', '$http', '$mdDialog', 'getList',
-  function ($scope, $rootScope, $routeParams, $http, $mdDialog, getList) {
+  'segregateData', 'orgDoneData', 'applyDetailChange',
+  function ($scope, $rootScope, $routeParams, $http, $mdDialog, getList,
+            segregateData, orgDoneData, applyDetailChange) {
     $scope.donors = $rootScope.donors;
     $scope.donorsDone = $rootScope.donorsDone;
     $scope.loading = true;
@@ -216,15 +211,9 @@ redDashboard.controller('DonorsCtrl', [
 
     // Update, check for any new data and fetch if available.
     getList('/donors').then(function (data) {
-      $scope.donors = $scope.donorsDone = [];
-      index = _.findIndex(data, _.matchesProperty('done', true));
-      while (index > -1) {
-        elem = data.splice(index, 1);
-        $scope.donorsDone.push(elem[0]);
-        index = _.findIndex(data, _.matchesProperty('done', true));
-      }
-      $rootScope.donors = $scope.donors = data;
-      $rootScope.donorsDone = $scope.donorsDone;
+      _.assign($scope, orgDoneData(segregateData(data), 'donors'));
+      _.assign($rootScope, { donors: $scope.donors,
+                             donorsDone: $scope.donorsDone });
       $scope.loading = false;
     });
 
@@ -236,27 +225,53 @@ redDashboard.controller('DonorsCtrl', [
         templateUrl: 'templates/detailDonor.html'
       })
       .then(function (ans) {
-        // done / undone
-        if (type == 'undone') {
-          index = _.findIndex($scope.donors,
-                              _.matchesProperty('donId', ans.donId));
-          $rootScope.donors[index] = $scope.donors[index] = ans;
-        } else if (type == 'done') {
-          index = _.findIndex($scope.donorsDone,
-                              _.matchesProperty('donId', ans.donId));
-          $rootScope.donorsDone[index] = $scope.donorsDone[index] = ans;
-        }
-        if (ans.done) {
-          removed = $scope.donors.splice(index, 1);
-          $rootScope.donors = $scope.donors;
-          $scope.donorsDone.push(removed[0]);
-          $rootScope.donorsDone = $scope.donorsDone;
-        } else {
-          removed = $scope.donorsDone.splice(index, 1);
-          $rootScope.donorsDone = $scope.donorsDone;
-          $scope.donors.push(removed[0]);
-          $rootScope.donors = $scope.donors;
-        }
+        // organize done & undone
+        _.assign($scope, orgDoneData(
+          applyDetailChange(type, ans, $scope.donors, $scope.donorsDone),
+          'donors'));
+        _.assign($rootScope, { donors: $scope.donors,
+                               donorsDone: $scope.donorsDone });
+      }, function () {
+        // cancelled
+      });
+    };
+  }
+]);
+
+
+/**
+ * Camps Controller
+ */
+redDashboard.controller('CampsCtrl', [
+  '$scope', '$rootScope', '$routeParams', '$http', '$mdDialog', 'getList',
+  'segregateData', 'orgDoneData', 'applyDetailChange',
+  function ($scope, $rootScope, $routeParams, $http, $mdDialog, getList,
+            segregateData, orgDoneData, applyDetailChange) {
+    $scope.camps = $rootScope.camps;
+    $scope.campsDone = $rootScope.campsDone;
+    $scope.loading = true;
+    var index, elem, removed;
+
+    // Get camps list
+    getList('/camps').then(function (data) {
+      _.assign($scope, orgDoneData(segregateData(data), 'camps'));
+      _.assign($rootScope, { camps: $scope.camps,
+                             campsDone: $scope.campsDone });
+      $scope.loading = false;
+    });
+
+    $scope.detail = function (req, type) {
+      $rootScope.detailView = req;
+      $mdDialog.show({
+        controller: DialogController,
+        templateUrl: 'templates/detailCamp.html'
+      })
+      .then(function (ans) {
+        _.assign($scope, orgDoneData(
+          applyDetailChange(type, ans, $scope.camps, $scope.campsDone),
+          'camps'));
+        _.assign($rootScope, { camps: $scope.camps,
+                               campsDone: $scope.campsDone });
       }, function () {
         // cancelled
       });
@@ -336,8 +351,12 @@ redDashboard.config(['$mdThemingProvider', '$routeProvider',
         templateUrl: 'templates/donors.html',
         controller: 'DonorsCtrl'
       })
+      .when('/camps', {
+        templateUrl: 'templates/camps.html',
+        controller: 'CampsCtrl'
+      })
       .when('/create-camp', {
-        templateUrl: 'templates/camp.html',
+        templateUrl: 'templates/createCamp.html',
         controller: 'CreateCampCtrl'
       })
       .otherwise({
@@ -437,3 +456,131 @@ redDashboard.factory('submitCamp', ['$http', function ($http) {
     return promise;
   };
 }]);
+
+
+/**
+ * Segregate the data received into done and undone.
+ *
+ * @param {Object} data
+ *    Data to be segregated, like donors list.
+ *
+ * @return {Object}
+ *    An object with arrays of done and undone data.
+ */
+redDashboard.factory('segregateData', function () {
+  return function (data) {
+    var index, elem, removed, item, itemDone;
+    item = itemDone = [];
+    index = _.findIndex(data, _.matchesProperty('done', true));
+    while (index > -1) {
+      elem = data.splice(index, 1);
+      itemDone.push(elem[0]);
+      index = _.findIndex(data, _.matchesProperty('done', true));
+    }
+    return {
+      undone: data,
+      done: itemDone
+    };
+  };
+});
+
+
+/**
+ * Organize Done/Undone Data as per their context.
+ *
+ * @param {Object} data
+ *    Segregated data from segregateData
+ *
+ * @param {String} context
+ *    Context of the data.
+ *
+ * @return {Object}
+ *    An object of data with proper contextual property name.
+ */
+redDashboard.factory('orgDoneData', function () {
+  return function (data, context) {
+    var result = {};
+    switch (context) {
+      case 'bloodreqs':
+        result.bloodReqs = data.undone;
+        result.reqsDone = data.done;
+        break;
+
+      case 'donors':
+        result.donors = data.undone;
+        result.donorsDone = data.done;
+        break;
+
+      case 'camps':
+        result.camps = data.undone;
+        result.campsDone = data.done;
+
+      default:
+
+    }
+    return result;
+  }
+});
+
+
+/**
+ * Apply Detail View Change to the item.
+ *
+ * @param {String} type
+ *    Type of change, 'done' or 'undone'.
+ *
+ * @param {Object} ans
+ *    Object properties retrieved from the detail view.
+ *
+ * @param {Array} undone
+ *    An array of undone items.
+ *
+ * @param {Array} done
+ *    An array of done items.
+ *
+ * @return {Object}
+ *    Object containing done and undone arrays.
+ */
+redDashboard.factory('applyDetailChange', ['indexOfId', function (indexOfId) {
+  return function (type, ans, undone, done) {
+    var index, removed;
+
+    if (type == 'undone') {
+      index = indexOfId(undone, ans.id);
+      undone[index] = ans;
+    } else if (type == 'done') {
+      index = indexOfId(done, ans.id);
+      done[index] = ans;
+    }
+
+    if (ans.done) {
+      done.push(undone.splice(index, 1)[0]);
+    } else {
+      undone.push(done.splice(index, 1)[0]);
+    }
+
+    return {
+      done: done,
+      undone: undone
+    }
+  }
+}]);
+
+
+/**
+ * Returns index of given id from a given list.
+ *
+ * @param {Array} list
+ *    List of items.
+ *
+ * @param {Number} id
+ *    ID value.
+ *
+ * @return {Number}
+ *    Index of the item with the required id.
+ */
+redDashboard.factory('indexOfId', function () {
+  return function (list, id) {
+    return _.findIndex(list, _.matchesProperty('id', id));
+  };
+})

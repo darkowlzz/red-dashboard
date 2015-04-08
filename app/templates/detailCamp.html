@@ -1,38 +1,34 @@
 <md-dialog aria-label="Detail">
   <md-content class="sticky-container">
-    <md-subheader class="md-sticky-no-effect">Blood Donor</md-subheader>
+    <md-subheader class="md-sticky-no-effect">Blood Donation Camp</md-subheader>
     <div class="dialog-content">
       <div layout="row" layout-sm="column" layout-align="space-between center" layout-align-sm="space-between start">
         <div flex>
-          <ng-md-icon class="avatar" icon="person"></ng-md-icon>
-          <span class="listName">{{detail.name}}</span>
+          <ng-md-icon class="avatar" icon="group_work"></ng-md-icon>
+          <span class="listName">{{detail.title}}</span>
         </div>
         <div flex>
-          <ng-md-icon class="avatar" icon="lens"></ng-md-icon>
-          <span class="listOthers">{{detail.group}}</span>
+          <ng-md-icon class="avatar" icon="location_on"></ng-md-icon>
+          <span class="listOthers">{{detail.location}}</span>
         </div>
       </div>
       <div layout="row" layout-sm="column" layout-align="space-between center" layout-align-sm="space-between start">
         <div flex>
-          <ng-md-icon class="avatar" icon="email"></ng-md-icon>
+          <ng-md-icon class="avatar" icon="person"></ng-md-icon>
           <span class="listOthers">
-            <a href="mailto:{{detail.email}}">{{detail.email}}</a>
+            <a href="mailto:{{detail.email}}">{{detail.organizer}}</a>
           </span>
         </div>
         <div flex>
           <ng-md-icon class="avatar" icon="phone"></ng-md-icon>
           <span class="listOthers">
-            <a href="tel:{{detail.phone}}">{{detail.phone}}</a>
+            <a href="tel:{{detail.phone}}">{{detail.contact}}</a>
           </span>
         </div>
       </div>
       <div>
-        <ng-md-icon class="avatar" icon="location_on"></ng-md-icon>
-        <span class="listOthers">{{detail.address}}</span><br>
-      </div>
-      <div>
-        <ng-md-icon class="avatar" icon="access_time"></ng-md-icon>
-        <span class="listOthers">{{detail.age}} Years</span><br>
+        <ng-md-icon class="avatar" icon="event"></ng-md-icon>
+        <span class="listOthers">{{detail.date}}</span><br>
       </div>
     </div>
   </md-content>
@@ -42,10 +38,10 @@
       <md-button ng-click="cancel()">
         Close
       </md-button>
-      <md-button ng-hide="detail.done" ng-click="done(detail, 'donor')">
+      <md-button ng-hide="detail.done" ng-click="done(detail, 'camp')">
         Done
       </md-button>
-      <md-button ng-show="detail.done" ng-click="undone(detail, 'donor')">
+      <md-button ng-show="detail.done" ng-click="undone(detail, 'camp')">
         Mark UnDone
       </md-button>
     </div>

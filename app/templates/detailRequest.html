@@ -38,10 +38,10 @@
       <md-button ng-click="cancel()">
         Close
       </md-button>
-      <md-button ng-hide="detail.done" ng-click="done(detail)">
+      <md-button ng-hide="detail.done" ng-click="done(detail, 'request')">
         Done
       </md-button>
-      <md-button ng-show="detail.done" ng-click="undone(detail)">
+      <md-button ng-show="detail.done" ng-click="undone(detail, 'request')">
         Mark UnDone
       </md-button>
     </div>

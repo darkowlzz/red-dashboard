@@ -26,7 +26,7 @@ var reqSchema = new mongoose.Schema({
   group: { type: String },
   quantity: { type: Number },
   reqOn: { type: String },
-  reqId: { type: Number },
+  id: { type: Number },
   done: { type: Boolean }
 });
 var BloodReq = mongoose.model('bloodreqs', reqSchema);
@@ -38,7 +38,7 @@ var donorSchema = new mongoose.Schema({
   phone: { type: String },
   address: { type: String },
   group: { type: String },
-  donId: { type: Number },
+  id: { type: Number },
   done: { type: Boolean }
 });
 var Donor = mongoose.model('donors', donorSchema);
@@ -49,7 +49,8 @@ var campSchema = new mongoose.Schema({
   date: { type: String },
   organizer: { type: String },
   contact: { type: String },
-  id: { type: Number }
+  id: { type: Number },
+  done: { type: Boolean }
 });
 var Camp = mongoose.model('camps', campSchema);
 
@@ -59,6 +60,7 @@ var statusSchema = new mongoose.Schema({
 });
 var Status = mongoose.model('status', statusSchema);
 
+
 //app specific configurations
 //==================================================
 
@@ -66,13 +68,16 @@ app.use('/', express.static(__dirname + '/app/'));
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true }));
 
+
 //router configurations
 //============================================
 
+// Render index.html
 router.get('/', function (req, res) {
 	res.render('/index.html');
 });
 
+// Get blood request data
 router.get('/bloodreqs', function (req, res) {
   BloodReq.find({}).exec(function (err, result) {
     if (!err) {
@@ -84,6 +89,7 @@ router.get('/bloodreqs', function (req, res) {
   });
 });
 
+// Get blood donors data
 router.get('/donors', function (req, res) {
   Donor.find({}).exec(function (err, result) {
     if (!err) {
@@ -95,8 +101,21 @@ router.get('/donors', function (req, res) {
   });
 });
 
+// Get camps data
+router.get('/camps', function (req, res) {
+  Camp.find({}).exec(function (err, result) {
+    if (!err) {
+      res.json(result);
+    } else {
+      console.log('Error retrieving data');
+      res.json({ Error: 'failed to retrieve data' });
+    }
+  });
+});
+
+// Change blood request 'done' status
 router.post('/request/done', function (req, res) {
-  BloodReq.findOne({reqId: req.body.data.reqId }, function (err, aReq) {
+  BloodReq.findOne({ id: req.body.data.id }, function (err, aReq) {
     // set done value
     aReq.done = req.body.done;
     aReq.save(function (err, obj) {
@@ -110,13 +129,14 @@ router.post('/request/done', function (req, res) {
   });
 });
 
+// Change blood donor 'done' status
 router.post('/donor/done', function (req, res) {
-  Donor.findOne({donId: req.body.data.donId }, function (err, aDon) {
+  Donor.findOne({ id: req.body.data.id }, function (err, aDon) {
     // set done value
     aDon.done = req.body.done;
     aDon.save(function (err, obj) {
       if (err) {
-        console.log('error updating blood request');
+        console.log('error updating donor');
         res.json({error: true});
       } else {
         res.json(obj);
@@ -125,8 +145,23 @@ router.post('/donor/done', function (req, res) {
   });
 });
 
+// Change camp 'done' status
+router.post('/camp/done', function (req, res) {
+  Camp.findOne({ id: req.body.data.id }, function (err, aCamp) {
+    aCamp.done = req.body.done;
+    aCamp.save(function (err, obj) {
+      if (err) {
+        console.log('error updating camp');
+        res.json({error: true});
+      } else {
+        res.json(obj);
+      }
+    });
+  });
+});
+
+// Post and create new camp
 router.post('/camp/new', function (req, res) {
-  console.log('received', req.body);
   var aCamp = new Camp({
     title: req.body.title || '',
     location: req.body.location || '',
@@ -156,6 +191,7 @@ router.post('/camp/new', function (req, res) {
 });
 
 app.use('/', router);
+
 
 //run the server========================
 var server = app.listen(port, function(){
