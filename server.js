@@ -190,6 +190,48 @@ router.post('/camp/new', function (req, res) {
   });
 });
 
+// get total blood requests count
+router.get('/stats/bloodreqs', function (req, res) {
+  BloodReq.find({}).count().exec(function (err, count) {
+    res.json({ count: count });
+  });
+});
+
+// get blood requests done count
+router.get('/stats/bloodreqs/done', function (req, res) {
+  BloodReq.find({done: true}).count().exec(function (err, count) {
+    res.json({ count: count });
+  });
+});
+
+// get total donors count
+router.get('/stats/donors', function (req, res) {
+  Donor.find({}).count().exec(function (err, count) {
+    res.json({ count: count });
+  });
+});
+
+// get donors done count
+router.get('/stats/donors/done', function (req, res) {
+  Donor.find({done: true}).count().exec(function (err, count) {
+    res.json({ count: count });
+  });
+});
+
+// get total camps count
+router.get('/stats/camps', function (req, res) {
+  Donor.find({}).count().exec(function (err, count) {
+    res.json({ count: count });
+  });
+});
+
+// get camps done count
+router.get('/stats/camps/done', function (req, res) {
+  Camp.find({done: true}).count().exec(function (err, count) {
+    res.json({ count: count });
+  });
+});
+
 app.use('/', router);
 
 

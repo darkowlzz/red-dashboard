@@ -37,6 +37,14 @@ redDashboard.controller('MainCtrl', [
     $rootScope.donorsDone = [];
     $rootScope.camps = [];
     $rootScope.campsDone = [];
+    $rootScope.stats = {
+      camps: 0,
+      campsDone: 0,
+      bloodReqs: 0,
+      bloodReqsDone: 0,
+      donors: 0,
+      donorsDone: 0
+    };
 
     // Toggle open/close sidenav bar
     $scope.toggleSidebar = function () {
@@ -60,9 +68,33 @@ redDashboard.controller('MainCtrl', [
  * Dashboard Controller
  */
 redDashboard.controller('DashboardCtrl', [
-  '$scope', '$routeParams',
-  function ($scope, $routeParams) {
+  '$scope', '$rootScope', '$routeParams', '$http', 'getList',
+  function ($scope, $rootScope, $routeParams, $http, getList) {
+    $scope.stats = $rootScope.stats;
 
+    getList('stats/bloodreqs').then(function (data) {
+      $rootScope.stats.bloodReqs = $scope.stats.bloodReqs = data.count;
+    });
+
+    getList('stats/bloodreqs/done').then(function (data) {
+      $rootScope.stats.bloodReqsDone = $scope.stats.bloodReqsDone = data.count;
+    });
+
+    getList('stats/donors').then(function (data) {
+      $rootScope.stats.donors = $scope.stats.donors = data.count;
+    });
+
+    getList('stats/donors/done').then(function (data) {
+      $rootScope.stats.donorsDone = $scope.stats.donorsDone = data.count;
+    });
+
+    getList('stats/camps').then(function (data) {
+      $rootScope.stats.camps = $scope.stats.camps = data.count;
+    });
+
+    getList('stats/camps/done').then(function (data) {
+      $rootScope.stats.campsDone = $scope.stats.campsDone = data.count;
+    });
   }
 ]);
 
@@ -583,4 +615,4 @@ redDashboard.factory('indexOfId', function () {
   return function (list, id) {
     return _.findIndex(list, _.matchesProperty('id', id));
   };
-})
+});

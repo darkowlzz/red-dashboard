@@ -1,3 +1,17 @@
-<p>
-  Dashboard body
-</p>
+<div>
+  <h3>Camps</h3>
+  <p>Camps held: {{ stats.campsDone }}</p>
+  <p>Upcoming camps: {{ stats.camps - stats.campsDone }}</p>
+</div>
+<hr>
+<div>
+  <h3>Donors</h3>
+  <p>Donors: {{ stats.donorsDone }}</p>
+  <p>New Donors: {{ stats.donors - stats.donorsDone }}</p>
+</div>
+<hr>
+<div>
+  <h3>Blood Requests</h3>
+  <p>Request served: {{ stats.bloodReqsDone }}</p>
+  <p>Pending Requests: {{ stats.bloodReqs - stats.bloodReqsDone }}</p>
+</div>
