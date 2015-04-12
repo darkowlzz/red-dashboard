@@ -10,6 +10,10 @@ var port = process.env.PORT || 3000; //port set to 3000
 
 var uristring = process.env.MONGODB_URI || 'mongodb://localhost/step';
 
+//database connection and schema
+//===============================================
+
+// Connect to db
 mongoose.connect(uristring, function (err, res) {
   if (err) {
     console.log('Error connecting to db');
@@ -18,6 +22,7 @@ mongoose.connect(uristring, function (err, res) {
   }
 });
 
+// Blood Request Schema
 var reqSchema = new mongoose.Schema({
   name: { type: String },
   email: { type: String },
@@ -31,6 +36,7 @@ var reqSchema = new mongoose.Schema({
 });
 var BloodReq = mongoose.model('bloodreqs', reqSchema);
 
+// Blood Donor Schema
 var donorSchema = new mongoose.Schema({
   name: { type: String },
   age: { type: Number },
@@ -43,6 +49,7 @@ var donorSchema = new mongoose.Schema({
 });
 var Donor = mongoose.model('donors', donorSchema);
 
+// Camp Schema
 var campSchema = new mongoose.Schema({
   title: { type: String },
   location: { type: String },
@@ -55,6 +62,7 @@ var campSchema = new mongoose.Schema({
 });
 var Camp = mongoose.model('camps', campSchema);
 
+// Status Schema
 var statusSchema = new mongoose.Schema({
   name: { type: String },
   count: { type: Number }
@@ -80,103 +88,52 @@ router.get('/', function (req, res) {
 
 // Get blood request data
 router.get('/bloodreqs', function (req, res) {
-  BloodReq.find({}).exec(function (err, result) {
-    if (!err) {
-      res.json(result);
-    } else {
-      console.log('Error retrieving data');
-      res.json({ Error: 'failed to retrieve data' });
-    }
-  });
+  query({}, 'request', res);
 });
 
 // Get pending blood requests
 router.get('/bloodreqs/pending', function (req, res) {
-  BloodReq.find({done: false}).exec(function (err, result) {
-    if (!err) {
-      res.json(result);
-    } else {
-      console.log('Error retrieving data');
-      res.json({ Error: 'failed to retrieve data' });
-    }
-  });
+  query({done: false}, 'request', res);
 });
 
 // Get blood donors data
 router.get('/donors', function (req, res) {
-  Donor.find({}).exec(function (err, result) {
-    if (!err) {
-      res.json(result);
-    } else {
-      console.log('Error retrieving data');
-      res.json({ Error: 'failed to retrieve data' });
-    }
-  });
+  query({}, 'donor', res);
+});
+
+// Get pending blood donors
+router.get('/donors/pending', function (req, res) {
+  query({done: false}, 'donor', res);
 });
 
 // Get camps data
 router.get('/camps', function (req, res) {
-  Camp.find({}).exec(function (err, result) {
-    if (!err) {
-      res.json(result);
-    } else {
-      console.log('Error retrieving data');
-      res.json({ Error: 'failed to retrieve data' });
-    }
-  });
+  query({}, 'camp', res);
+});
+
+// Get pending camps
+router.get('/camps/pending', function (req, res) {
+  query({done: false}, 'camp', res);
 });
 
 // Change blood request 'done' status
 router.post('/request/done', function (req, res) {
-  BloodReq.findOne({ id: req.body.data.id }, function (err, aReq) {
-    // set done value
-    aReq.done = req.body.done;
-    aReq.save(function (err, obj) {
-      if (err) {
-        console.log('error updating blood request');
-        res.json({error: true});
-      } else {
-        res.json(obj);
-      }
-    });
-  });
+  done(req, res, 'request');
 });
 
 // Change blood donor 'done' status
 router.post('/donor/done', function (req, res) {
-  Donor.findOne({ id: req.body.data.id }, function (err, aDon) {
-    // set done value
-    aDon.done = req.body.done;
-    aDon.save(function (err, obj) {
-      if (err) {
-        console.log('error updating donor');
-        res.json({error: true});
-      } else {
-        res.json(obj);
-      }
-    });
-  });
+  done(req, res, 'donor');
 });
 
 // Change camp 'done' status
 router.post('/camp/done', function (req, res) {
-  Camp.findOne({ id: req.body.data.id }, function (err, aCamp) {
-    aCamp.done = req.body.done;
-    aCamp.save(function (err, obj) {
-      if (err) {
-        console.log('error updating camp');
-        res.json({error: true});
-      } else {
-        res.json(obj);
-      }
-    });
-  });
+  done(req, res, 'camp');
 });
 
 // Post and create new camp
 router.post('/camp/new', function (req, res) {
   var data = req.body;
-  console.log('date is', JSON.stringify(data.date));
   var aCamp = new Camp({
     title: data.title || '',
     location: data.location || '',
@@ -257,3 +214,113 @@ app.use('/', router);
 var server = app.listen(port, function(){
 	console.log('server has started running at localhost:' + port);
 });
+
+
+/**
+ * Query the database
+ *
+ * @param {Object} data
+ *    Query data.
+ *
+ * @param {String} model
+ *    Model name of the collection.
+ *
+ * @param {Object} res
+ *    The response object.
+ */
+function query(data, model, res) {
+  var that = {};
+  that.res = res;
+
+  switch (model) {
+    case 'request':
+      BloodReq.find(data).exec(function (err, result) {
+        resultCallback.bind(that, err, result)();
+      });
+      break;
+
+    case 'donor':
+      Donor.find(data).exec(function (err, result) {
+        resultCallback.bind(that, err, result)();
+      });
+      break;
+
+    case 'camp':
+      Camp.find(data).exec(function (err, result) {
+        resultCallback.bind(that, err, result)();
+      });
+      break;
+
+    default:
+
+  }
+}
+
+/**
+ * Result callback to handle the obtained result from db.
+ *
+ * @param {Object} err - Error message.
+ *
+ * @param {Object} result - Result data.
+ */
+function resultCallback (err, result) {
+  if (!err) {
+    this.res.json(result);
+  } else {
+    console.log('Error receiving data');
+    this.res.json({ Error: 'failed to retrieve data' });
+  }
+}
+
+/**
+ * Change done status of objects.
+ *
+ * @param {Object} req - Request object.
+ *
+ * @param {Object} res - Response object.
+ *
+ * @param {String} model - Model name of the collection.
+ */
+function done (req, res, model) {
+  var that = this;
+  that.req = req;
+  that.res = res;
+
+  switch (model) {
+    case 'request':
+      BloodReq.findOne({ id: that.req.body.data.id }, function (err, rObj) {
+        saveCallback.bind(that, err, rObj)();
+      });
+      break;
+
+    case 'donor':
+      Donor.findOne({ id: that.req.body.data.id }, function (err, rObj) {
+        saveCallback.bind(that, err, rObj)();
+      });
+      break;
+
+    case 'camp':
+      Camp.findOne({ id: that.req.body.data.id }, function (err, rObj) {
+        saveCallback.bind(that, err, rObj)();
+      });
+      break;
+
+    default:
+
+  }
+}
+
+/**
+ * Modify and save data.
+ *
+ * @param {Object} err - Error message.
+ *
+ * @param {Object} obj - Object to be saved.
+ */
+function saveCallback (err, obj) {
+  var that = this;
+  obj.done = that.req.body.done;
+  obj.save(function (err, result) {
+    resultCallback.bind(that, err, result)();
+  });
+}

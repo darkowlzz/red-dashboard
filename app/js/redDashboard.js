@@ -29,7 +29,7 @@ redDashboard.controller('MainCtrl', [
       }
     };
 
-    // Dummy data
+    // Initialize data
     $scope.username = 'John Doe';
     $rootScope.bloodReqs = [];
     $rootScope.reqsDone = [];
@@ -194,15 +194,13 @@ redDashboard.controller('RequestsCtrl', [
   function ($scope, $rootScope, $routeParams, $http, $mdDialog, getList,
             segregateData, orgDoneData, applyDetailChange) {
     $scope.bloodReqs = $rootScope.bloodReqs;
-    $scope.reqsDone = $rootScope.reqsDone;
+    $scope.reqsDone = $rootScope.reqsDone = [];
     $scope.loading = true;
     var index, elem, removed;
 
     // Get blood request list
-    getList('/bloodreqs').then(function (data) {
-      _.assign($scope, orgDoneData(segregateData(data), 'bloodreqs'));
-      _.assign($rootScope, { bloodReqs: $scope.bloodReqs,
-                             reqsDone: $scope.reqsDone });
+    getList('/bloodreqs/pending').then(function (data) {
+      $rootScope.bloodReqs = $scope.bloodReqs = data;
       $scope.loading = false;
     });
 
@@ -237,15 +235,13 @@ redDashboard.controller('DonorsCtrl', [
   function ($scope, $rootScope, $routeParams, $http, $mdDialog, getList,
             segregateData, orgDoneData, applyDetailChange) {
     $scope.donors = $rootScope.donors;
-    $scope.donorsDone = $rootScope.donorsDone;
+    $scope.donorsDone = $rootScope.donorsDone = [];
     $scope.loading = true;
     var index, elem, removed;
 
     // Update, check for any new data and fetch if available.
-    getList('/donors').then(function (data) {
-      _.assign($scope, orgDoneData(segregateData(data), 'donors'));
-      _.assign($rootScope, { donors: $scope.donors,
-                             donorsDone: $scope.donorsDone });
+    getList('/donors/pending').then(function (data) {
+      $rootScope.donors = $scope.donors = data;
       $scope.loading = false;
     });
 
@@ -280,15 +276,13 @@ redDashboard.controller('CampsCtrl', [
   function ($scope, $rootScope, $routeParams, $http, $mdDialog, getList,
             segregateData, orgDoneData, applyDetailChange) {
     $scope.camps = $rootScope.camps;
-    $scope.campsDone = $rootScope.campsDone;
+    $scope.campsDone = $rootScope.campsDone = [];
     $scope.loading = true;
     var index, elem, removed;
 
     // Get camps list
-    getList('/camps').then(function (data) {
-      _.assign($scope, orgDoneData(segregateData(data), 'camps'));
-      _.assign($rootScope, { camps: $scope.camps,
-                             campsDone: $scope.campsDone });
+    getList('/camps/pending').then(function (data) {
+      $scope.camps = $rootScope.camps = data;
       $scope.loading = false;
     });
 
