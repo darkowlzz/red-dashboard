@@ -1,6 +1,7 @@
 <div layout="column">
   <md-content class="md-padding" ng-hide="submitted">
     <h2>Create new camp</h2>
+
     <form name="campForm">
       <div layout="column" layout-gt-md="row">
         <md-input-container flex>
@@ -34,14 +35,32 @@
           </div>
         </md-input-container>
       </div>
-      <md-input-container>
-        <label>Date</label>
-        <input required name="date" ng-model="camp.date" placeholder>
-        <div ng-messages="campForm.date.$error">
-          <div ng-message="required">Date is required.</div>
-        </div>
-      </md-input-container>
+      <p>Date</p>
+      <div layout="row">
+        <md-input-container flex>
+          <label>Day</label>
+          <input required name="day" ng-model="camp.date.day" type="number" min="1" max="31" placeholder="1-31">
+          <div ng-messages="campForm.day.$error">
+            <div ng-message="required">This is required.</div>
+          </div>
+        </md-input-container>
+        <md-input-container flex>
+          <label>Month</label>
+          <input required name="month" ng-model="camp.date.month" type="number" min="1" max="12" placeholder="1-12">
+          <div ng-messages="campForm.month.$error">
+            <div ng-message="required">This is required.</div>
+          </div>
+        </md-input-container>
+        <md-input-container flex>
+          <label>Year</label>
+          <input required name="year" ng-model="camp.date.year" type="number" min="2015" max="2016" placeholder="2015-16">
+          <div ng-messages="campForm.year.$error">
+            <div ng-message="required">This is required.</div>
+          </div>
+        </md-input-container>
+      </div>
     </form>
+
     <section layout="column" layout-align="center center">
       <md-button ng-click="submit()" ng-hide="loading" class="md-raised md-accent" aria-label="Create camp">
         Create Camp
@@ -52,9 +71,11 @@
       </div>
       <md-progress-circular ng-show="loading" class="md-hue-2" md-mode="indeterminate"></md-progress-circular>
     </section>
+
   </md-content>
+
   <div ng-show="submitted">
     <p>Camp created!</p>
   </div>
-</div>
 
+</div>

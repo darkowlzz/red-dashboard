@@ -46,10 +46,11 @@ var Donor = mongoose.model('donors', donorSchema);
 var campSchema = new mongoose.Schema({
   title: { type: String },
   location: { type: String },
-  date: { type: String },
+  date: { type: Date },
   organizer: { type: String },
   contact: { type: String },
   id: { type: Number },
+  modifiedOn: { type: Date },
   done: { type: Boolean }
 });
 var Camp = mongoose.model('camps', campSchema);
@@ -80,6 +81,18 @@ router.get('/', function (req, res) {
 // Get blood request data
 router.get('/bloodreqs', function (req, res) {
   BloodReq.find({}).exec(function (err, result) {
+    if (!err) {
+      res.json(result);
+    } else {
+      console.log('Error retrieving data');
+      res.json({ Error: 'failed to retrieve data' });
+    }
+  });
+});
+
+// Get pending blood requests
+router.get('/bloodreqs/pending', function (req, res) {
+  BloodReq.find({done: false}).exec(function (err, result) {
     if (!err) {
       res.json(result);
     } else {
@@ -162,12 +175,17 @@ router.post('/camp/done', function (req, res) {
 
 // Post and create new camp
 router.post('/camp/new', function (req, res) {
+  var data = req.body;
+  console.log('date is', JSON.stringify(data.date));
   var aCamp = new Camp({
-    title: req.body.title || '',
-    location: req.body.location || '',
-    date: req.body.date || '',
-    organizer: req.body.organizer || '',
-    contact: req.body.contact || ''
+    title: data.title || '',
+    location: data.location || '',
+    date: new Date(data.date.year, data.date.month - 1, data.date.day) ||
+          new Date,
+    organizer: data.organizer || '',
+    contact: data.contact || '',
+    modifiedOn: new Date,
+    done: false
   });
 
   Status.findOne({name: 'camps'}, function (err, stat) {
