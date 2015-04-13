@@ -234,21 +234,24 @@ function query(data, model, res) {
 
   switch (model) {
     case 'request':
-      BloodReq.find(data).exec(function (err, result) {
-        resultCallback.bind(that, err, result)();
-      });
+      BloodReq.find(data).sort({modifiedOn: 'descending'}).
+        exec(function (err, result) {
+          resultCallback.bind(that, err, result)();
+        });
       break;
 
     case 'donor':
-      Donor.find(data).exec(function (err, result) {
-        resultCallback.bind(that, err, result)();
-      });
+      Donor.find(data).sort({modifiedOn: 'descending'}).
+        exec(function (err, result) {
+          resultCallback.bind(that, err, result)();
+        });
       break;
 
     case 'camp':
-      Camp.find(data).exec(function (err, result) {
-        resultCallback.bind(that, err, result)();
-      });
+      Camp.find(data).sort({modifiedOn: 'descending'}).
+        exec(function (err, result) {
+          resultCallback.bind(that, err, result)();
+        });
       break;
 
     default:
