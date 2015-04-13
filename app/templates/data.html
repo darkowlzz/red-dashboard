@@ -1,1 +1,34 @@
-<p>Query data here</p>
+<div layout="row" layout-align="space-around start">
+  <md-select placeholder="Collection" ng-model="collection">
+    <md-option value="bloodReqs">Requests</md-option>
+    <md-option value="donors">Donors</md-option>
+    <md-option value="camps">Camps</md-option>
+  </md-select>
+  <md-input-container>
+    <label>Search Term</label>
+    <input type="text" ng-model="qTerm" placeholder="O+, 26, Naharlagun">
+  </md-input-container>
+  <md-button class="md-fab avatar" aria-label="search" ng-click="search()">
+    <ng-md-icon icon="search"></ng-md-icon>
+  </md-button>
+</div>
+
+<hr>
+
+<div layout="column" layout-margin>
+  <md-card ng-repeat="item in resultData">
+    <md-card-content>
+      <div layout="row" layout-align="space-between center">
+        <div flex="55">
+          <ng-md-icon class="avatar" icon="person"></ng-md-icon>
+          <span class="listName">{{item[primaryProp]}}</span>
+        </div>
+        <div flex="45">
+          <ng-md-icon class="avatar" icon="lens"></ng-md-icon>
+          <span class="listOthers">{{item[secondaryProp]}}</span>
+        </div>
+      </div>
+    </md-card-content>
+  </md-card>
+</div>
+

@@ -207,6 +207,28 @@ router.get('/stats/camps/done', function (req, res) {
   });
 });
 
+// post search data and return search results
+router.post('/data', function (req, res) {
+  var that = this;
+  that.req = req;
+  that.res = res;
+  var data = req.body;
+  var model;
+
+  if (data.collection == 'bloodReqs') {
+    model = BloodReq;
+  } else if (data.collection == 'donors') {
+    model = Donor;
+  } else if (data.collection == 'camps') {
+    model = Camp;
+  }
+
+  model.find().sort({modifiedOn: 'descending'}).
+    exec(function (err, result) {
+      resultCallback.bind(that, err, result)();
+    });
+});
+
 app.use('/', router);
 
 

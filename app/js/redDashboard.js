@@ -45,6 +45,14 @@ redDashboard.controller('MainCtrl', [
       donors: 0,
       donorsDone: 0
     };
+    $rootScope.data = {
+      collection: null,
+      qTerm: '',
+      resultCollection: null,
+      resultData: [],
+      primaryProp: null,
+      secondaryProp: null
+    }
 
     // Toggle open/close sidenav bar
     $scope.toggleSidebar = function () {
@@ -368,9 +376,46 @@ redDashboard.controller('CreateCampCtrl', [
 /**
  * Data Controller
  */
-redDashboard.controller('DataCtrl', ['$scope', '$routeParams',
-  function ($scope, $routeParams, submitCamp) {
+redDashboard.controller('DataCtrl', [
+  '$scope', '$rootScope', '$routeParams', 'queryData',
+  function ($scope, $rootScope, $routeParams, queryData) {
+    $scope.collection = $rootScope.data.collection;
+    $scope.qTerm = $rootScope.data.qTerm;
+    $scope.resultCollection = $rootScope.data.resultCollection;
+    $scope.resultData = $rootScope.data.resultData;
+    $scope.primaryProp = $rootScope.data.primaryProp;
+    $scope.secondaryProp = $rootScope.data.secondaryProp;
 
+    $scope.search = function () {
+      if ($scope.collection) {
+      queryData({ collection: $scope.collection, qTerm: $scope.qTerm }).
+        then(function (data) {
+          $rootScope.data.resultData = $scope.resultData = data;
+          $rootScope.data.resultCollection = $scope.resultCollection
+            = $rootScope.data.collection = $scope.collection;
+          $rootScope.data.qTerm = $scope.qTerm;
+
+          switch ($scope.resultCollection) {
+            case 'bloodReqs':
+
+            case 'donors':
+              $rootScope.data.primaryProp = $scope.primaryProp = 'name';
+              $rootScope.data.secondaryProp = $scope.secondaryProp = 'group';
+              break;
+
+            case 'camps':
+              $rootScope.data.primaryProp = $scope.primaryProp = 'title';
+              $rootScope.data.secondaryProp = $scope.secondaryProp = 'location';
+              break;
+
+            default:
+
+          }
+        });
+      } else {
+        console.log('collection is null');
+      }
+    }
   }
 ]);
 
@@ -446,6 +491,18 @@ redDashboard.factory('done', ['$http',
   }
 ]);
 
+
+redDashboard.factory('queryData', ['$http',
+  function ($http) {
+    return function (data) {
+      var promise = $http.post('/data', data).
+                      then(function (resp) {
+                        return resp.data;
+                      });
+      return promise;
+    }
+  }
+]);
 
 /**
  * undone service to set `done` value to false for donors or requests.
