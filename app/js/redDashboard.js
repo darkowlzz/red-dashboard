@@ -193,14 +193,19 @@ redDashboard.controller('RequestsCtrl', [
   'segregateData', 'orgDoneData', 'applyDetailChange',
   function ($scope, $rootScope, $routeParams, $http, $mdDialog, getList,
             segregateData, orgDoneData, applyDetailChange) {
-    $scope.bloodReqs = $rootScope.bloodReqs;
-    $scope.reqsDone = $rootScope.reqsDone = [];
+    $scope.undone = $rootScope.bloodReqs;
+    $scope.done = $rootScope.reqsDone = [];
     $scope.loading = true;
+
+    // Properties to be displayed in brief
+    $scope.primaryProp = 'name';
+    $scope.secondaryProp = 'group';
+
     var index, elem, removed;
 
     // Get blood request list
     getList('/bloodreqs/pending').then(function (data) {
-      $rootScope.bloodReqs = $scope.bloodReqs = data;
+      $rootScope.bloodReqs = $scope.undone = data;
       $scope.loading = false;
     });
 
@@ -214,10 +219,10 @@ redDashboard.controller('RequestsCtrl', [
       .then(function (ans) {
         // organize done & undone
         _.assign($scope, orgDoneData(
-          applyDetailChange(type, ans, $scope.bloodReqs, $scope.reqsDone),
+          applyDetailChange(type, ans, $scope.undone, $scope.done),
           'bloodreqs'));
-        _.assign($rootScope, { bloodReqs: $scope.bloodReqs,
-                               reqsDone: $scope.reqsDone });
+        _.assign($rootScope, { bloodReqs: $scope.undone,
+                               reqsDone: $scope.done });
       }, function () {
         // cancelled
       });
@@ -234,14 +239,19 @@ redDashboard.controller('DonorsCtrl', [
   'segregateData', 'orgDoneData', 'applyDetailChange',
   function ($scope, $rootScope, $routeParams, $http, $mdDialog, getList,
             segregateData, orgDoneData, applyDetailChange) {
-    $scope.donors = $rootScope.donors;
-    $scope.donorsDone = $rootScope.donorsDone = [];
+    $scope.undone = $rootScope.donors;
+    $scope.done = $rootScope.donorsDone = [];
     $scope.loading = true;
+
+    // Properties to be displayed in breif
+    $scope.primaryProp = 'name';
+    $scope.secondaryProp = 'group';
+
     var index, elem, removed;
 
     // Update, check for any new data and fetch if available.
     getList('/donors/pending').then(function (data) {
-      $rootScope.donors = $scope.donors = data;
+      $rootScope.donors = $scope.undone = data;
       $scope.loading = false;
     });
 
@@ -255,10 +265,10 @@ redDashboard.controller('DonorsCtrl', [
       .then(function (ans) {
         // organize done & undone
         _.assign($scope, orgDoneData(
-          applyDetailChange(type, ans, $scope.donors, $scope.donorsDone),
+          applyDetailChange(type, ans, $scope.undone, $scope.done),
           'donors'));
-        _.assign($rootScope, { donors: $scope.donors,
-                               donorsDone: $scope.donorsDone });
+        _.assign($rootScope, { donors: $scope.undone,
+                               donorsDone: $scope.done });
       }, function () {
         // cancelled
       });
@@ -275,14 +285,19 @@ redDashboard.controller('CampsCtrl', [
   'segregateData', 'orgDoneData', 'applyDetailChange',
   function ($scope, $rootScope, $routeParams, $http, $mdDialog, getList,
             segregateData, orgDoneData, applyDetailChange) {
-    $scope.camps = $rootScope.camps;
-    $scope.campsDone = $rootScope.campsDone = [];
+    $scope.undone = $rootScope.camps;
+    $scope.done = $rootScope.campsDone = [];
     $scope.loading = true;
+
+    // Properties to be displayed in brief
+    $scope.primaryProp = 'title';
+    $scope.secondaryProp = 'location';
+
     var index, elem, removed;
 
     // Get camps list
     getList('/camps/pending').then(function (data) {
-      $scope.camps = $rootScope.camps = data;
+      $scope.undone = $rootScope.camps = data;
       $scope.loading = false;
     });
 
@@ -294,10 +309,10 @@ redDashboard.controller('CampsCtrl', [
       })
       .then(function (ans) {
         _.assign($scope, orgDoneData(
-          applyDetailChange(type, ans, $scope.camps, $scope.campsDone),
+          applyDetailChange(type, ans, $scope.undone, $scope.done),
           'camps'));
-        _.assign($rootScope, { camps: $scope.camps,
-                               campsDone: $scope.campsDone });
+        _.assign($rootScope, { camps: $scope.undone,
+                               campsDone: $scope.done });
       }, function () {
         // cancelled
       });
@@ -384,15 +399,15 @@ redDashboard.config(['$mdThemingProvider', '$routeProvider',
         controller: 'DataCtrl'
       })
       .when('/requests', {
-        templateUrl: 'templates/requests.html',
+        templateUrl: 'templates/pending.html',
         controller: 'RequestsCtrl'
       })
       .when('/donors', {
-        templateUrl: 'templates/donors.html',
+        templateUrl: 'templates/pending.html',
         controller: 'DonorsCtrl'
       })
       .when('/camps', {
-        templateUrl: 'templates/camps.html',
+        templateUrl: 'templates/pending.html',
         controller: 'CampsCtrl'
       })
       .when('/create-camp', {

@@ -27,8 +27,14 @@
         </div>
       </div>
       <div>
-        <ng-md-icon class="avatar" icon="location_on"></ng-md-icon>
-        <span class="listOthers">{{detail.address}}</span><br>
+        <div flex>
+          <ng-md-icon class="avatar" icon="location_on"></ng-md-icon>
+          <span class="listOthers">{{detail.address}}</span><br>
+        </div>
+        <div flex>
+          <ng-md-icon class="avatar" icon="alarm"></ng-md-icon>
+          <span class="listOthers">{{detail.reqOn | date:'mediumDate'}}</span><br>
+        </div>
       </div>
     </div>
   </md-content>

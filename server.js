@@ -30,7 +30,7 @@ var reqSchema = new mongoose.Schema({
   address: { type: String },
   group: { type: String },
   quantity: { type: Number },
-  reqOn: { type: String },
+  reqOn: { type: Date },
   id: { type: Number },
   done: { type: Boolean }
 });

@@ -5,16 +5,16 @@
 
 <h3>Undone</h3>
 <div layout="column" layout-margin>
-  <md-card ng-repeat="donor in donors">
-    <md-card-content ng-click="detail(donor, 'undone')">
+  <md-card ng-repeat="item in undone">
+    <md-card-content ng-click="detail(item, 'undone')">
       <div layout="row" layout-align="space-between center">
         <div flex="55">
           <ng-md-icon class="avatar" icon="person"></ng-md-icon>
-          <span class="listName">{{donor.name}}</span>
+          <span class="listName">{{item[primaryProp]}}</span>
         </div>
         <div flex="45">
           <ng-md-icon class="avatar" icon="lens"></ng-md-icon>
-          <span class="listOthers">{{donor.group}}</span>
+          <span class="listOthers">{{item[secondaryProp]}}</span>
         </div>
       </div>
     </md-card-content>
@@ -23,16 +23,16 @@
 <hr>
 <h3>Done</h3>
 <div layout="column" layout-margin>
-  <md-card ng-repeat="donor in donorsDone">
-    <md-card-content ng-click="detail(donor, 'done')">
+  <md-card ng-repeat="item in done">
+    <md-card-content ng-click="detail(item, 'done')">
       <div layout="row" layout-align="space-between center">
         <div flex="55">
           <ng-md-icon class="avatar" icon="person"></ng-md-icon>
-          <span class="listName">{{donor.name}}</span>
+          <span class="listName">{{item[primaryProp]}}</span>
         </div>
         <div flex="45">
           <ng-md-icon class="avatar" icon="lens"></ng-md-icon>
-          <span class="listOthers">{{donor.group}}</span>
+          <span class="listOthers">{{item[secondaryProp]}}</span>
         </div>
       </div>
     </md-card-content>
