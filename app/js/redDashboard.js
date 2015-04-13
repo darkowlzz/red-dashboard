@@ -350,6 +350,16 @@ redDashboard.controller('CreateCampCtrl', [
 ]);
 
 
+/**
+ * Data Controller
+ */
+redDashboard.controller('DataCtrl', ['$scope', '$routeParams',
+  function ($scope, $routeParams, submitCamp) {
+
+  }
+]);
+
+
 // Module configuration
 redDashboard.config(['$mdThemingProvider', '$routeProvider',
   function($mdThemingProvider, $routeProvider) {
@@ -368,6 +378,10 @@ redDashboard.config(['$mdThemingProvider', '$routeProvider',
       .when('/profile', {
         templateUrl: 'templates/profile.html',
         controller: 'ProfileCtrl'
+      })
+      .when('/data', {
+        templateUrl: 'templates/data.html',
+        controller: 'DataCtrl'
       })
       .when('/requests', {
         templateUrl: 'templates/requests.html',
