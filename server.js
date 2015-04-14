@@ -1,10 +1,11 @@
 //modules and configs
 //===============================================
-var express = require('express'),
-    router  = express.Router(),
-    app     = express(),
+var express    = require('express'),
+    router     = express.Router(),
+    app        = express(),
     bodyParser = require('body-parser'),
-    mongoose = require('mongoose');
+    mongoose   = require('mongoose'),
+    _          = require('lodash');
 
 var port = process.env.PORT || 3000; //port set to 3000
 
@@ -52,7 +53,7 @@ var Donor = mongoose.model('donors', donorSchema);
 // Camp Schema
 var campSchema = new mongoose.Schema({
   title: { type: String },
-  location: { type: String },
+  address: { type: String },
   date: { type: Date },
   organizer: { type: String },
   contact: { type: String },
@@ -136,7 +137,7 @@ router.post('/camp/new', function (req, res) {
   var data = req.body;
   var aCamp = new Camp({
     title: data.title || '',
-    location: data.location || '',
+    address: data.location || '',
     date: new Date(data.date.year, data.date.month - 1, data.date.day) ||
           new Date,
     organizer: data.organizer || '',
@@ -213,7 +214,8 @@ router.post('/data', function (req, res) {
   that.req = req;
   that.res = res;
   var data = req.body;
-  var model;
+  var model,
+      queryData = {};
 
   if (data.collection == 'bloodReqs') {
     model = BloodReq;
@@ -223,7 +225,19 @@ router.post('/data', function (req, res) {
     model = Camp;
   }
 
-  model.find().sort({modifiedOn: 'descending'}).
+  if (! _.isUndefined(data.qTerm)) {
+
+  }
+
+  if (! _.isUndefined(data.qGroup)) {
+    queryData.group = data.qGroup;
+  }
+
+  if (! _.isUndefined(data.qPlace)) {
+    queryData.address = data.qPlace;
+  }
+
+  model.find(queryData).sort({modifiedOn: 'descending'}).
     exec(function (err, result) {
       resultCallback.bind(that, err, result)();
     });

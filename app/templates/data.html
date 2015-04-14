@@ -13,6 +13,25 @@
   </md-button>
 </div>
 
+  <div layout="row" layout-align="end center">
+    <md-button ng-hide="advancedSearch" ng-click="toggleAdvSearch()">Advanced Search Options</md-button>
+    <md-button ng-show="advancedSearch" ng-click="toggleAdvSearch()">Hide Advanced Options</md-button>
+  </div>
+
+  <div ng-show="advancedSearch" layout="row" layout-align="space-around start">
+    <div ng-hide="isGroupDisabled()">
+      <md-select placeholder="Group" ng-model="qGroup" >
+        <md-option ng-repeat="group in groups" value="{{group}}">{{group}}</md-option>
+      </md-select>
+    </div>
+    <div>
+      <md-input-container>
+        <label>Place</label>
+        <input type="text" ng-model="qPlace" placeholder="Nowhere">
+      </md-input-container>
+    </div>
+  </div>
+
 <hr>
 
 <div layout="column" layout-margin>

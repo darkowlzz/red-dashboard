@@ -48,10 +48,13 @@ redDashboard.controller('MainCtrl', [
     $rootScope.data = {
       collection: null,
       qTerm: '',
+      qGroup: '',
+      qPlace: '',
       resultCollection: null,
       resultData: [],
       primaryProp: null,
-      secondaryProp: null
+      secondaryProp: null,
+      advancedSearch: false
     }
 
     // Toggle open/close sidenav bar
@@ -381,37 +384,74 @@ redDashboard.controller('DataCtrl', [
   function ($scope, $rootScope, $routeParams, queryData) {
     $scope.collection = $rootScope.data.collection;
     $scope.qTerm = $rootScope.data.qTerm;
+    $scope.qGroup = $rootScope.data.qGroup;
+    $scope.qPlace = $rootScope.data.qPlace;
     $scope.resultCollection = $rootScope.data.resultCollection;
     $scope.resultData = $rootScope.data.resultData;
     $scope.primaryProp = $rootScope.data.primaryProp;
     $scope.secondaryProp = $rootScope.data.secondaryProp;
+    $scope.advancedSearch = $rootScope.data.advancedSearch;
+
+    $scope.groups = ['All', 'A+', 'A-', 'B+', 'B-', 'O+', 'O-'];
+
+    // Returns true if the group option has to be disabled
+    $scope.isGroupDisabled = function () {
+      if ($scope.collection == 'camps') {
+        $scope.qGroup = $rootScope.data.qGroup = '';
+        return true;
+      } else {
+        return false;
+      }
+    };
+
+    // Toggle advanced search options
+    $scope.toggleAdvSearch = function () {
+      $rootScope.data.advancedSearch
+        = $scope.advancedSearch = ! $scope.advancedSearch;
+    };
 
     $scope.search = function () {
       if ($scope.collection) {
-      queryData({ collection: $scope.collection, qTerm: $scope.qTerm }).
-        then(function (data) {
-          $rootScope.data.resultData = $scope.resultData = data;
-          $rootScope.data.resultCollection = $scope.resultCollection
-            = $rootScope.data.collection = $scope.collection;
-          $rootScope.data.qTerm = $scope.qTerm;
+        var queryObj = {collection: $scope.collection};
 
-          switch ($scope.resultCollection) {
-            case 'bloodReqs':
+        if ($scope.qTerm != '') {
+          queryObj.qTerm = $scope.qTerm;
+        }
 
-            case 'donors':
-              $rootScope.data.primaryProp = $scope.primaryProp = 'name';
-              $rootScope.data.secondaryProp = $scope.secondaryProp = 'group';
-              break;
+        if (($scope.qGroup != '') && ($scope.qGroup != 'All') &&
+            ($scope.advancedSearch)) {
+          queryObj.qGroup = $scope.qGroup;
+        }
 
-            case 'camps':
-              $rootScope.data.primaryProp = $scope.primaryProp = 'title';
-              $rootScope.data.secondaryProp = $scope.secondaryProp = 'location';
-              break;
+        if (($scope.qPlace != '') && ($scope.advancedSearch)) {
+          queryObj.qPlace = $scope.qPlace;
+        }
 
-            default:
+        queryData(queryObj).
+          then(function (data) {
+            $rootScope.data.resultData = $scope.resultData = data;
+            $rootScope.data.resultCollection = $scope.resultCollection
+              = $rootScope.data.collection = $scope.collection;
+            $rootScope.data.qTerm = $scope.qTerm;
 
-          }
-        });
+            switch ($scope.resultCollection) {
+              case 'bloodReqs':
+
+              case 'donors':
+                $rootScope.data.primaryProp = $scope.primaryProp = 'name';
+                $rootScope.data.secondaryProp = $scope.secondaryProp = 'group';
+                break;
+
+              case 'camps':
+                $rootScope.data.primaryProp = $scope.primaryProp = 'title';
+                $rootScope.data.secondaryProp
+                  = $scope.secondaryProp = 'address';
+                break;
+
+              default:
+
+            }
+          });
       } else {
         console.log('collection is null');
       }
