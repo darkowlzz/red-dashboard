@@ -4,8 +4,9 @@ var express    = require('express'),
     router     = express.Router(),
     app        = express(),
     bodyParser = require('body-parser'),
-    mongoose   = require('mongoose'),
-    _          = require('lodash');
+    _          = require('lodash'),
+    mongoose   = require('mongoose');
+    //textSearch = require('mongoose-text-search');
 
 var port = process.env.PORT || 3000; //port set to 3000
 
@@ -35,6 +36,11 @@ var reqSchema = new mongoose.Schema({
   id: { type: Number },
   done: { type: Boolean }
 });
+/**
+ * Search plugin
+reqSchema.plugin(textSearch);
+reqSchema.index({name: 'text', email: 'text'});
+ */
 var BloodReq = mongoose.model('bloodreqs', reqSchema);
 
 // Blood Donor Schema
@@ -225,9 +231,14 @@ router.post('/data', function (req, res) {
     model = Camp;
   }
 
+  /*
+   * Text search
   if (! _.isUndefined(data.qTerm)) {
-
+    model.textSearch(data.qTerm, function (err, data) {
+      res.json(data);
+    });
   }
+  */
 
   if (! _.isUndefined(data.qGroup)) {
     queryData.group = data.qGroup;
@@ -235,6 +246,10 @@ router.post('/data', function (req, res) {
 
   if (! _.isUndefined(data.qPlace)) {
     queryData.address = data.qPlace;
+  }
+
+  if (! _.isUndefined(data.qDate)) {
+    queryData.date = data.qDate;
   }
 
   model.find(queryData).sort({modifiedOn: 'descending'}).

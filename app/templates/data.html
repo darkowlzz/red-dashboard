@@ -4,10 +4,13 @@
     <md-option value="donors">Donors</md-option>
     <md-option value="camps">Camps</md-option>
   </md-select>
+  <!--
+  ** The text search box **
   <md-input-container>
     <label>Search Term</label>
-    <input type="text" ng-model="qTerm" placeholder="O+, 26, Naharlagun">
+    <input type="text" ng-model="qTerm" placeholder="Name or email">
   </md-input-container>
+  -->
   <md-button class="md-fab avatar" aria-label="search" ng-click="search()">
     <ng-md-icon icon="search"></ng-md-icon>
   </md-button>
@@ -19,10 +22,24 @@
   </div>
 
   <div ng-show="advancedSearch" layout="row" layout-align="space-around start">
-    <div ng-hide="isGroupDisabled()">
+    <div ng-hide="isCampsEnabled()">
       <md-select placeholder="Group" ng-model="qGroup" >
         <md-option ng-repeat="group in groups" value="{{group}}">{{group}}</md-option>
       </md-select>
+    </div>
+    <div layout="row" ng-show="isCampsEnabled()">
+      <md-input-container>
+        <label>Day</label>
+        <input ng-model="qDay" type="number" min="1" max="31" placeholder="1-31">
+      </md-input-container>
+      <md-input-container>
+        <label>Month</label>
+        <input ng-model="qMonth" type="number" min="1" max="12" placeholder="1-12">
+      </md-input-container>
+      <md-input-container>
+        <label>Year</label>
+        <input ng-model="qYear" type="number" min="2015" max="2016" placeholder="2015-16">
+      </md-input-container>
     </div>
     <div>
       <md-input-container>

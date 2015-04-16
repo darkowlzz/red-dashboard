@@ -47,9 +47,8 @@ redDashboard.controller('MainCtrl', [
     };
     $rootScope.data = {
       collection: null,
-      qTerm: '',
-      qGroup: '',
-      qPlace: '',
+      //qTerm: '',
+      qGroup: null, qPlace: '', qDay: null, qMonth: null, qYear: null,
       resultCollection: null,
       resultData: [],
       primaryProp: null,
@@ -383,7 +382,7 @@ redDashboard.controller('DataCtrl', [
   '$scope', '$rootScope', '$routeParams', 'queryData',
   function ($scope, $rootScope, $routeParams, queryData) {
     $scope.collection = $rootScope.data.collection;
-    $scope.qTerm = $rootScope.data.qTerm;
+    //$scope.qTerm = $rootScope.data.qTerm;
     $scope.qGroup = $rootScope.data.qGroup;
     $scope.qPlace = $rootScope.data.qPlace;
     $scope.resultCollection = $rootScope.data.resultCollection;
@@ -395,11 +394,14 @@ redDashboard.controller('DataCtrl', [
     $scope.groups = ['All', 'A+', 'A-', 'B+', 'B-', 'O+', 'O-'];
 
     // Returns true if the group option has to be disabled
-    $scope.isGroupDisabled = function () {
+    $scope.isCampsEnabled = function () {
       if ($scope.collection == 'camps') {
-        $scope.qGroup = $rootScope.data.qGroup = '';
+        $scope.qGroup = $rootScope.data.qGroup = null;
         return true;
       } else {
+        $scope.qDay = $rootScope.data.qDay = null;
+        $scope.qMonth = $rootScope.data.qMonth = null;
+        $scope.qYear = $rootScope.data.qYear = null;
         return false;
       }
     };
@@ -414,17 +416,25 @@ redDashboard.controller('DataCtrl', [
       if ($scope.collection) {
         var queryObj = {collection: $scope.collection};
 
-        if ($scope.qTerm != '') {
+        /*
+        if ($scope.qTerm != null) {
           queryObj.qTerm = $scope.qTerm;
         }
+        */
 
-        if (($scope.qGroup != '') && ($scope.qGroup != 'All') &&
+        if (($scope.qGroup != null) && ($scope.qGroup != 'All') &&
             ($scope.advancedSearch)) {
           queryObj.qGroup = $scope.qGroup;
         }
 
         if (($scope.qPlace != '') && ($scope.advancedSearch)) {
           queryObj.qPlace = $scope.qPlace;
+        }
+
+        if (($scope.qDay != null) && ($scope.qMonth != null) &&
+            ($scope.qYear != null) && ($scope.advancedSearch)) {
+          queryObj.qDate = new Date($scope.qYear, $scope.qMonth - 1,
+                                    $scope.qDay);
         }
 
         queryData(queryObj).
