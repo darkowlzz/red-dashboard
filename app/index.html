@@ -10,7 +10,7 @@
 
   <body layout="row" ng-controller="MainCtrl" ng-cloak>
 
-    <md-sidenav md-swipe-left="sidebarClose()" md-is-locked-open="$mdMedia('gt-sm')" class="site-sidenav md-whiteframe-z2" md-component-id="left" ng-cloak="">
+    <md-sidenav ng-show="isLoggedIn()" md-swipe-left="sidebarClose()" md-is-locked-open="$mdMedia('gt-sm')" class="site-sidenav md-whiteframe-z2" md-component-id="left" ng-cloak="">
 
       <md-toolbar class="md-primary" layout="row" layout-align="center center">
         <div layout-padding>
@@ -22,54 +22,56 @@
       </md-toolbar>
 
       <md-list layout="column" layout-align="center center">
-        <md-item>
-          <md-button ng-click="go('/profile', 'Profile')">
-            <ng-md-icon class="avatar" icon="account_circle" size="48"></ng-md-icon>
-            Hello, {{ username }}
-          </md-button>
-        </md-item>
-        <md-item>
-          <md-button ng-click="go('/', 'Home')">
-            <ng-md-icon class="avatar" icon="home" size="48"></ng-md-icon>
-            Dashboard Home
-          </md-button>
-        </md-item>
-        <md-item>
-          <md-button ng-click="go('/data', 'Data')">
-            <ng-md-icon class="avatar" icon="data_usage" size="48"></ng-md-icon>
-            Data
-          </md-button>
-        </md-item>
-        <md-item>
-          <md-button ng-click="go('/requests', 'Blood Requests')">
-            <ng-md-icon class="avatar" icon="favorite" size="48"></ng-md-icon>
-            Blood Requests
-          </md-button>
-        </md-item>
-        <md-item>
-          <md-button ng-click="go('/donors', 'Blood Donors')">
-            <ng-md-icon class="avatar" icon="accessibility" size="48"></ng-md-icon>
-            Blood Donors
-          </md-button>
-        </md-item>
-        <md-item>
-          <md-button ng-click="go('/camps', 'Camps')">
-            <ng-md-icon class="avatar" icon="store_mall_directory" size="48"></ng-md-icon>
-            Camps
-          </md-button>
-        </md-item>
-        <md-item>
-          <md-button ng-click="go('/create-camp', 'Create Camp')">
-            <ng-md-icon class="avatar" icon="create" size="48"></ng-md-icon>
-            Create Camp
-          </md-button>
-        </md-item>
-        <md-item>
-          <md-button ng-click="go('/')">
-            <ng-md-icon class="avatar" icon="exit_to_app" size="48"></ng-md-icon>
-            Log out
-          </md-button>
-        </md-item>
+        <div>
+          <md-item>
+            <md-button ng-click="go('/profile', 'Profile')">
+              <ng-md-icon class="avatar" icon="account_circle" size="48"></ng-md-icon>
+              Hello, {{ username }}
+            </md-button>
+          </md-item>
+          <md-item>
+            <md-button ng-click="go('/', 'Home')">
+              <ng-md-icon class="avatar" icon="home" size="48"></ng-md-icon>
+              Dashboard Home
+            </md-button>
+          </md-item>
+          <md-item>
+            <md-button ng-click="go('/data', 'Data')">
+              <ng-md-icon class="avatar" icon="data_usage" size="48"></ng-md-icon>
+              Data
+            </md-button>
+          </md-item>
+          <md-item>
+            <md-button ng-click="go('/requests', 'Blood Requests')">
+              <ng-md-icon class="avatar" icon="favorite" size="48"></ng-md-icon>
+              Blood Requests
+            </md-button>
+          </md-item>
+          <md-item>
+            <md-button ng-click="go('/donors', 'Blood Donors')">
+              <ng-md-icon class="avatar" icon="accessibility" size="48"></ng-md-icon>
+              Blood Donors
+            </md-button>
+          </md-item>
+          <md-item>
+            <md-button ng-click="go('/camps', 'Camps')">
+              <ng-md-icon class="avatar" icon="store_mall_directory" size="48"></ng-md-icon>
+              Camps
+            </md-button>
+          </md-item>
+          <md-item>
+            <md-button ng-click="go('/create-camp', 'Create Camp')">
+              <ng-md-icon class="avatar" icon="create" size="48"></ng-md-icon>
+              Create Camp
+            </md-button>
+          </md-item>
+          <md-item>
+            <md-button ng-click="go('/login')">
+              <ng-md-icon class="avatar" icon="exit_to_app" size="48"></ng-md-icon>
+              {{ isLoggedIn() ? "Log Out" : "Log In" }}
+            </md-button>
+          </md-item>
+        </div>
       </md-list>
     </md-sidenav>
 

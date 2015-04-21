@@ -5,10 +5,12 @@ var express    = require('express'),
     app        = express(),
     bodyParser = require('body-parser'),
     _          = require('lodash'),
-    mongoose   = require('mongoose');
+    mongoose   = require('mongoose'),
+    expressJwt = require('express-jwt'),
+    jwt        = require('jsonwebtoken');
     //textSearch = require('mongoose-text-search');
 
-var port = process.env.PORT || 3000; //port set to 3000
+var port = process.env.PORT || 8000; //port set to 3000
 
 var uristring = process.env.MONGODB_URI || 'mongodb://localhost/step';
 
@@ -83,10 +85,40 @@ var Status = mongoose.model('status', statusSchema);
 app.use('/', express.static(__dirname + '/app/'));
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true }));
+var secret = 'foo';
+app.use('/api', expressJwt({secret: secret}));
 
 
 //router configurations
 //============================================
+
+router.post('/authenticate', function (req, res) {
+  if (!(req.body.username === 'john.doe' && req.body.password === 'foobar')) {
+    res.status(401).send('Wrong user or password');
+    return;
+  }
+
+  var profile = {
+    first_name: 'John',
+    last_name: 'Doe',
+    email: 'j@d.com',
+    id: 123
+  };
+
+  var token = jwt.sign(profile, secret, { expiresInMinutes: 60*5 });
+
+  res.json({ user: profile, token: token });
+});
+
+/*
+app.get('/api/restricted', function (req, res) {
+  console.log('inside restricted');
+  console.log('user ' + req.user.email + ' is calling /api/restricted');
+  res.json({
+    name: 'foo'
+  });
+});
+*/
 
 // Render index.html
 router.get('/', function (req, res) {
@@ -94,52 +126,52 @@ router.get('/', function (req, res) {
 });
 
 // Get blood request data
-router.get('/bloodreqs', function (req, res) {
+router.get('/api/bloodreqs', function (req, res) {
   query({}, 'request', res);
 });
 
 // Get pending blood requests
-router.get('/bloodreqs/pending', function (req, res) {
+router.get('/api/bloodreqs/pending', function (req, res) {
   query({done: false}, 'request', res);
 });
 
 // Get blood donors data
-router.get('/donors', function (req, res) {
+router.get('/api/donors', function (req, res) {
   query({}, 'donor', res);
 });
 
 // Get pending blood donors
-router.get('/donors/pending', function (req, res) {
+router.get('/api/donors/pending', function (req, res) {
   query({done: false}, 'donor', res);
 });
 
 // Get camps data
-router.get('/camps', function (req, res) {
+router.get('/api/camps', function (req, res) {
   query({}, 'camp', res);
 });
 
 // Get pending camps
-router.get('/camps/pending', function (req, res) {
+router.get('/api/camps/pending', function (req, res) {
   query({done: false}, 'camp', res);
 });
 
 // Change blood request 'done' status
-router.post('/request/done', function (req, res) {
+router.post('/api/request/done', function (req, res) {
   done(req, res, 'request');
 });
 
 // Change blood donor 'done' status
-router.post('/donor/done', function (req, res) {
+router.post('/api/donor/done', function (req, res) {
   done(req, res, 'donor');
 });
 
 // Change camp 'done' status
-router.post('/camp/done', function (req, res) {
+router.post('/api/camp/done', function (req, res) {
   done(req, res, 'camp');
 });
 
 // Post and create new camp
-router.post('/camp/new', function (req, res) {
+router.post('/api/camp/new', function (req, res) {
   var data = req.body;
   var aCamp = new Camp({
     title: data.title || '',
@@ -173,49 +205,49 @@ router.post('/camp/new', function (req, res) {
 });
 
 // get total blood requests count
-router.get('/stats/bloodreqs', function (req, res) {
+router.get('/api/stats/bloodreqs', function (req, res) {
   BloodReq.find({}).count().exec(function (err, count) {
     res.json({ count: count });
   });
 });
 
 // get blood requests done count
-router.get('/stats/bloodreqs/done', function (req, res) {
+router.get('/api/stats/bloodreqs/done', function (req, res) {
   BloodReq.find({done: true}).count().exec(function (err, count) {
     res.json({ count: count });
   });
 });
 
 // get total donors count
-router.get('/stats/donors', function (req, res) {
+router.get('/api/stats/donors', function (req, res) {
   Donor.find({}).count().exec(function (err, count) {
     res.json({ count: count });
   });
 });
 
 // get donors done count
-router.get('/stats/donors/done', function (req, res) {
+router.get('/api/stats/donors/done', function (req, res) {
   Donor.find({done: true}).count().exec(function (err, count) {
     res.json({ count: count });
   });
 });
 
 // get total camps count
-router.get('/stats/camps', function (req, res) {
+router.get('/api/stats/camps', function (req, res) {
   Donor.find({}).count().exec(function (err, count) {
     res.json({ count: count });
   });
 });
 
 // get camps done count
-router.get('/stats/camps/done', function (req, res) {
+router.get('/api/stats/camps/done', function (req, res) {
   Camp.find({done: true}).count().exec(function (err, count) {
     res.json({ count: count });
   });
 });
 
 // post search data and return search results
-router.post('/data', function (req, res) {
+router.post('/api/data', function (req, res) {
   var that = this;
   that.req = req;
   that.res = res;

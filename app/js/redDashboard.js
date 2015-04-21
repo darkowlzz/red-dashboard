@@ -8,9 +8,9 @@ var redDashboard = angular.module('redDashboard', [
 
 redDashboard.controller('MainCtrl', [
   '$scope', '$rootScope', '$route', '$routeParams',
-  '$location', '$mdMedia', '$mdSidenav',
+  '$location', '$mdMedia', '$mdSidenav', '$window',
   function ($scope, $rootScope, $route, $routeParams,
-            $location, $mdMedia, $mdSidenav) {
+            $location, $mdMedia, $mdSidenav, $window) {
 
     /**
      * Goes to the given path
@@ -20,7 +20,7 @@ redDashboard.controller('MainCtrl', [
      * @param {String} sectionName
      *    Title of the Nav section, used in the page header.
      */
-    $scope.go = function (path, sectionName) {
+    $rootScope.go = $scope.go = function (path, sectionName) {
       $location.url(path);
       $scope.currentSection = sectionName;
 
@@ -29,31 +29,55 @@ redDashboard.controller('MainCtrl', [
       }
     };
 
-    // Initialize data
-    $scope.username = 'John Doe';
-    $rootScope.bloodReqs = [];
-    $rootScope.reqsDone = [];
-    $rootScope.donors = [];
-    $rootScope.donorsDone = [];
-    $rootScope.camps = [];
-    $rootScope.campsDone = [];
-    $rootScope.stats = {
-      camps: 0,
-      campsDone: 0,
-      bloodReqs: 0,
-      bloodReqsDone: 0,
-      donors: 0,
-      donorsDone: 0
+    // Check if the session is logged in
+    $rootScope.isLoggedIn = $scope.isLoggedIn = function () {
+      if ($window.sessionStorage.token) {
+        return true;
+      } else {
+        return false;
+      }
     };
-    $rootScope.data = {
-      collection: null,
-      //qTerm: '',
-      qGroup: null, qPlace: '', qDay: null, qMonth: null, qYear: null,
-      resultCollection: null,
-      resultData: [],
-      primaryProp: null,
-      secondaryProp: null,
-      advancedSearch: false
+
+    // Initialize data
+    $rootScope.init = function (user) {
+      $scope.username = user.first_name;
+    }
+
+    // Reset all the data
+    $rootScope.reset = function () {
+      $rootScope.username = '';
+      $rootScope.bloodReqs = [];
+      $rootScope.reqsDone = [];
+      $rootScope.donors = [];
+      $rootScope.donorsDone = [];
+      $rootScope.camps = [];
+      $rootScope.campsDone = [];
+      $rootScope.stats = {
+        camps: 0,
+        campsDone: 0,
+        bloodReqs: 0,
+        bloodReqsDone: 0,
+        donors: 0,
+        donorsDone: 0
+      };
+      $rootScope.data = {
+        collection: null,
+        //qTerm: '',
+        qGroup: null, qPlace: '', qDay: null, qMonth: null, qYear: null,
+        resultCollection: null,
+        resultData: [],
+        primaryProp: null,
+        secondaryProp: null,
+        advancedSearch: false
+      }
+    }
+
+    $rootScope.reset();
+    if ($window.sessionStorage.token) {
+      console.log('session', $window.sessionStorage.token);
+    } else {
+      console.log('resetting');
+      $rootScope.loggedIn = false;
     }
 
     // Toggle open/close sidenav bar
@@ -82,27 +106,27 @@ redDashboard.controller('DashboardCtrl', [
   function ($scope, $rootScope, $routeParams, $http, getList) {
     $scope.stats = $rootScope.stats;
 
-    getList('stats/bloodreqs').then(function (data) {
+    getList('/api/stats/bloodreqs').then(function (data) {
       $rootScope.stats.bloodReqs = $scope.stats.bloodReqs = data.count;
     });
 
-    getList('stats/bloodreqs/done').then(function (data) {
+    getList('/api/stats/bloodreqs/done').then(function (data) {
       $rootScope.stats.bloodReqsDone = $scope.stats.bloodReqsDone = data.count;
     });
 
-    getList('stats/donors').then(function (data) {
+    getList('/api/stats/donors').then(function (data) {
       $rootScope.stats.donors = $scope.stats.donors = data.count;
     });
 
-    getList('stats/donors/done').then(function (data) {
+    getList('/api/stats/donors/done').then(function (data) {
       $rootScope.stats.donorsDone = $scope.stats.donorsDone = data.count;
     });
 
-    getList('stats/camps').then(function (data) {
+    getList('/api/stats/camps').then(function (data) {
       $rootScope.stats.camps = $scope.stats.camps = data.count;
     });
 
-    getList('stats/camps/done').then(function (data) {
+    getList('/api/stats/camps/done').then(function (data) {
       $rootScope.stats.campsDone = $scope.stats.campsDone = data.count;
     });
   }
@@ -113,9 +137,11 @@ redDashboard.controller('DashboardCtrl', [
  * Profile Controller
  */
 redDashboard.controller('ProfileCtrl', [
-  '$scope', '$routeParams',
-  function ($scope, $routeParams) {
-
+  '$scope', '$rootScope', '$routeParams',
+  function ($scope, $rootScope, $routeParams) {
+    if (! $rootScope.isLoggedIn()) {
+      $rootScope.go('/login');
+    }
   }
 ]);
 
@@ -147,18 +173,18 @@ function DialogController ($scope, $rootScope, $mdDialog, done, undone) {
     $scope.loading = true;
     if (context == 'request') {
       // it is blood request
-      done('/request/done', data).then(function (resp) {
+      done('/api/request/done', data).then(function (resp) {
         $mdDialog.hide(resp);
         $scope.loading = false;
       });
     } else if (context == 'donor') {
       // it is blood donor
-      done('/donor/done', data).then(function (resp) {
+      done('/api/donor/done', data).then(function (resp) {
         $mdDialog.hide(resp);
         $scope.loading = false;
       });
     } else if (context == 'camp') {
-      done('/camp/done', data).then(function (resp) {
+      done('/api/camp/done', data).then(function (resp) {
         $mdDialog.hide(resp);
         $scope.loading = false;
       });
@@ -175,18 +201,18 @@ function DialogController ($scope, $rootScope, $mdDialog, done, undone) {
     $scope.loading = true;
     if (context == 'request') {
       // it is blood request
-      undone('/request/done', data).then(function (resp) {
+      undone('/api/request/done', data).then(function (resp) {
         $mdDialog.hide(resp);
         $scope.loading = false;
       });
     } else if (context == 'donor') {
       // it is blood donor
-      undone('/donor/done', data).then(function (resp) {
+      undone('/api/donor/done', data).then(function (resp) {
         $mdDialog.hide(resp);
         $scope.loading = false;
       });
     } else if (context == 'camp') {
-      undone('/camp/done', data).then(function (resp) {
+      undone('/api/camp/done', data).then(function (resp) {
         $mdDialog.hide(resp);
         $scope.loading = false;
       })
@@ -214,7 +240,7 @@ redDashboard.controller('RequestsCtrl', [
     var index, elem, removed;
 
     // Get blood request list
-    getList('/bloodreqs/pending').then(function (data) {
+    getList('/api/bloodreqs/pending').then(function (data) {
       $rootScope.bloodReqs = $scope.undone = data;
       $scope.loading = false;
     });
@@ -260,7 +286,7 @@ redDashboard.controller('DonorsCtrl', [
     var index, elem, removed;
 
     // Update, check for any new data and fetch if available.
-    getList('/donors/pending').then(function (data) {
+    getList('/api/donors/pending').then(function (data) {
       $rootScope.donors = $scope.undone = data;
       $scope.loading = false;
     });
@@ -306,7 +332,7 @@ redDashboard.controller('CampsCtrl', [
     var index, elem, removed;
 
     // Get camps list
-    getList('/camps/pending').then(function (data) {
+    getList('/api/camps/pending').then(function (data) {
       $scope.undone = $rootScope.camps = data;
       $scope.loading = false;
     });
@@ -335,8 +361,13 @@ redDashboard.controller('CampsCtrl', [
  * Create Camp Controller
  */
 redDashboard.controller('CreateCampCtrl', [
-  '$scope', '$routeParams', 'submitCamp',
-  function ($scope, $routeParams, submitCamp) {
+  '$scope', '$rootScope', '$routeParams', 'submitCamp',
+  function ($scope, $rootScope, $routeParams, submitCamp) {
+
+    if (! $rootScope.isLoggedIn()) {
+      $rootScope.go('/login');
+    }
+
     $scope.camp = {};
     $scope.loading = false;
     $scope.submitted = false;
@@ -351,7 +382,7 @@ redDashboard.controller('CreateCampCtrl', [
         $scope.loading = true;
 
         // Submit the form data
-        submitCamp('/camp/new', $scope.camp).then(function (resp) {
+        submitCamp('/api/camp/new', $scope.camp).then(function (resp) {
           $scope.loading = false;
           $scope.submitted = true;
         });
@@ -381,6 +412,11 @@ redDashboard.controller('CreateCampCtrl', [
 redDashboard.controller('DataCtrl', [
   '$scope', '$rootScope', '$routeParams', 'queryData',
   function ($scope, $rootScope, $routeParams, queryData) {
+
+    if (! $rootScope.isLoggedIn()) {
+      $rootScope.go('/login');
+    }
+
     $scope.collection = $rootScope.data.collection;
     //$scope.qTerm = $rootScope.data.qTerm;
     $scope.qGroup = $rootScope.data.qGroup;
@@ -470,6 +506,35 @@ redDashboard.controller('DataCtrl', [
 ]);
 
 
+/**
+ * User Controller
+ */
+redDashboard.controller('UserCtrl', [
+  '$scope', '$rootScope', '$http', '$window',
+  function ($scope, $rootScope, $http, $window) {
+    $rootScope.reset();
+    delete $window.sessionStorage.token;
+    $scope.user = {username: 'john.doe', password: 'foobar'};
+    $scope.message = '';
+    $scope.submit = function () {
+      console.log('sending data');
+      $http.post('/authenticate', $scope.user)
+           .success(function (data, status, headers, config) {
+             console.log('got reply', data);
+             $window.sessionStorage.token = data.token;
+             $rootScope.init(data.user);
+             $window.history.back();
+           })
+           .error(function (data, status, headers, config) {
+            delete $window.sessionStorage.token;
+
+            $scope.message = 'Error: Invalid user or password';
+           });
+    };
+  }
+]);
+
+
 // Module configuration
 redDashboard.config(['$mdThemingProvider', '$routeProvider',
   function($mdThemingProvider, $routeProvider) {
@@ -509,6 +574,10 @@ redDashboard.config(['$mdThemingProvider', '$routeProvider',
         templateUrl: 'templates/createCamp.html',
         controller: 'CreateCampCtrl'
       })
+      .when('/login', {
+        templateUrl: 'templates/login.html',
+        controller: 'UserCtrl'
+      })
       .otherwise({
         redirectTo: '/'
       });
@@ -545,7 +614,7 @@ redDashboard.factory('done', ['$http',
 redDashboard.factory('queryData', ['$http',
   function ($http) {
     return function (data) {
-      var promise = $http.post('/data', data).
+      var promise = $http.post('/api/data', data).
                       then(function (resp) {
                         return resp.data;
                       });
@@ -588,14 +657,21 @@ redDashboard.factory('undone', ['$http',
  *    Returns a promise which is completed when the whole of the requested
  *    data is fetched.
  */
-redDashboard.factory('getList', ['$http', function ($http) {
-  return function (uri) {
-    var promise = $http.get(uri).then(function (resp) {
-      return resp.data;
-    });
-    return promise;
-  };
-}]);
+redDashboard.factory('getList', ['$http', '$rootScope',
+  function ($http, $rootScope) {
+    return function (uri) {
+      var promise = $http.get(uri).then(function (resp) {
+        return resp.data;
+      }, function (err) {
+        console.log('failed to fetch', err);
+        $rootScope.reset();
+
+        $rootScope.go('/login');
+      });
+      return promise;
+    };
+  }
+]);
 
 
 /**
@@ -745,4 +821,28 @@ redDashboard.factory('indexOfId', function () {
   return function (list, id) {
     return _.findIndex(list, _.matchesProperty('id', id));
   };
+});
+
+
+redDashboard.factory('authInterceptor', function ($rootScope, $q, $window) {
+  return {
+    request: function (config) {
+      config.headers = config.headers || {};
+      if ($window.sessionStorage.token) {
+        config.headers.Authorization = 'Bearer ' + $window.sessionStorage.token;
+      }
+      return config;
+    },
+    response: function (response) {
+      if (response.status === 401) {
+
+      }
+      return response || $q.when(response);
+    }
+  }
+});
+
+
+redDashboard.config(function ($httpProvider) {
+  $httpProvider.interceptors.push('authInterceptor');
 });
