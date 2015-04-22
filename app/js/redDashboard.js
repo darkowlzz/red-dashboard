@@ -236,6 +236,7 @@ redDashboard.controller('RequestsCtrl', [
     // Properties to be displayed in brief
     $scope.primaryProp = 'name';
     $scope.secondaryProp = 'group';
+    $scope.type = 'person'; // type of icons
 
     var index, elem, removed;
 
@@ -282,6 +283,7 @@ redDashboard.controller('DonorsCtrl', [
     // Properties to be displayed in breif
     $scope.primaryProp = 'name';
     $scope.secondaryProp = 'group';
+    $scope.type = 'person'; // type of icons
 
     var index, elem, removed;
 
@@ -328,6 +330,7 @@ redDashboard.controller('CampsCtrl', [
     // Properties to be displayed in brief
     $scope.primaryProp = 'title';
     $scope.secondaryProp = 'location';
+    $scope.type = 'camp'; // type of icons
 
     var index, elem, removed;
 
@@ -845,4 +848,20 @@ redDashboard.factory('authInterceptor', function ($rootScope, $q, $window) {
 
 redDashboard.config(function ($httpProvider) {
   $httpProvider.interceptors.push('authInterceptor');
+});
+
+
+redDashboard.directive('cardDone', function () {
+  return {
+    restrict: 'E',
+    templateUrl: 'templates/cardDone.html'
+  };
+});
+
+
+redDashboard.directive('cardUndone', function () {
+  return {
+    restrict: 'E',
+    templateUrl: 'templates/cardUndone.html'
+  };
 });
