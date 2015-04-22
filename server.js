@@ -110,16 +110,6 @@ router.post('/authenticate', function (req, res) {
   res.json({ user: profile, token: token });
 });
 
-/*
-app.get('/api/restricted', function (req, res) {
-  console.log('inside restricted');
-  console.log('user ' + req.user.email + ' is calling /api/restricted');
-  res.json({
-    name: 'foo'
-  });
-});
-*/
-
 // Render index.html
 router.get('/', function (req, res) {
 	res.render('/index.html');
@@ -135,6 +125,12 @@ router.get('/api/bloodreqs/pending', function (req, res) {
   query({done: false}, 'request', res);
 });
 
+// Delete a request
+router.post('/api/delete/request', function (req, res) {
+  console.log('got delete req', JSON.stringify(req.body));
+  deleteDoc(req.body, 'request', res);
+});
+
 // Get blood donors data
 router.get('/api/donors', function (req, res) {
   query({}, 'donor', res);
@@ -145,6 +141,11 @@ router.get('/api/donors/pending', function (req, res) {
   query({done: false}, 'donor', res);
 });
 
+// Delete a donor
+router.post('/api/delete/donor', function (req, res) {
+  deleteDoc(req.body, 'donor', res);
+});
+
 // Get camps data
 router.get('/api/camps', function (req, res) {
   query({}, 'camp', res);
@@ -153,6 +154,11 @@ router.get('/api/camps', function (req, res) {
 // Get pending camps
 router.get('/api/camps/pending', function (req, res) {
   query({done: false}, 'camp', res);
+});
+
+// Delete a camp
+router.post('/api/delete/camp', function (req, res) {
+  deleteDoc(req.body, 'camp', res);
 });
 
 // Change blood request 'done' status
@@ -341,6 +347,48 @@ function query(data, model, res) {
 
   }
 }
+
+
+/**
+ * Delete document.
+ *
+ * @param {Object} data
+ *    Data to identify the document.
+ *
+ * @param {String} model
+ *    Model name of the collection.
+ *
+ * @param {Object} res
+ *    The response object.
+ */
+function deleteDoc(data, model, res) {
+  var that = {};
+  that.res = res;
+
+  switch (model) {
+    case 'request':
+      BloodReq.find(data).remove().exec(function (err, result) {
+        resultCallback.bind(that, err, result)();
+      });
+      break;
+
+    case 'donor':
+      Donor.find(data).remove().exec(function (err, result) {
+        resultCallback.bind(that, err, result)();
+      });
+      break;
+
+    case 'camp':
+      Camp.find(data).remove().exec(function (err, result) {
+        resultCallback.bind(that, err, result)();
+      });
+      break;
+
+    default:
+
+  }
+}
+
 
 /**
  * Result callback to handle the obtained result from db.
