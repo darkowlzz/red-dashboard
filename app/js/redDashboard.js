@@ -2,6 +2,11 @@ var redDashboard = angular.module('redDashboard', [
                               'ngRoute', 'ngMaterial', 'ngMdIcons'
                               ]);
 
+// module configuration
+redDashboard.config(function ($httpProvider) {
+  $httpProvider.interceptors.push('authInterceptor');
+});
+
 
 // Controllers
 // ============================================================
@@ -147,6 +152,21 @@ redDashboard.controller('ProfileCtrl', [
 
 
 /**
+ * Confirm delete dialog box
+ */
+function confirmDelete ($mdDialog, ev) {
+  return $mdDialog.confirm()
+    //.parent(angular.element(document.body)); // `parent` is undefined
+    .title('Would you like to delete this item?')
+    .content('Blah blah')
+    .ariaLabel('delete confirmation')
+    .ok('Yes, Delete it')
+    .cancel('Cancel')
+    .targetEvent(ev);
+}
+
+
+/**
  * Dialog box Controller for Detail Views.
  */
 function DialogController ($scope, $rootScope, $mdDialog, done, undone) {
@@ -226,9 +246,11 @@ function DialogController ($scope, $rootScope, $mdDialog, done, undone) {
  */
 redDashboard.controller('RequestsCtrl', [
   '$scope', '$rootScope', '$routeParams', '$http', '$mdDialog', 'getList',
-  'segregateData', 'orgDoneData', 'applyDetailChange',
+  'segregateData', 'orgDoneData', 'applyDetailChange', 'deleteItem',
+  'deleteFromList',
   function ($scope, $rootScope, $routeParams, $http, $mdDialog, getList,
-            segregateData, orgDoneData, applyDetailChange) {
+            segregateData, orgDoneData, applyDetailChange, deleteItem,
+            deleteFromList) {
     $scope.undone = $rootScope.bloodReqs;
     $scope.done = $rootScope.reqsDone = [];
     $scope.loading = true;
@@ -264,6 +286,18 @@ redDashboard.controller('RequestsCtrl', [
         // cancelled
       });
     };
+
+    // Delete an item
+    $scope.delete = function (ev, id, type) {
+      $mdDialog.show(confirmDelete($mdDialog, ev)).then(function () {
+        deleteItem('request', { id: id }).then(function (resp) {
+          _.assign($scope,
+                   deleteFromList(id, type, $scope.undone, $scope.done));
+        });
+      }, function () {
+        console.log('cancelled delete');
+      });
+    };
   }
 ]);
 
@@ -273,9 +307,11 @@ redDashboard.controller('RequestsCtrl', [
  */
 redDashboard.controller('DonorsCtrl', [
   '$scope', '$rootScope', '$routeParams', '$http', '$mdDialog', 'getList',
-  'segregateData', 'orgDoneData', 'applyDetailChange',
+  'segregateData', 'orgDoneData', 'applyDetailChange', 'deleteItem',
+  'deleteFromList',
   function ($scope, $rootScope, $routeParams, $http, $mdDialog, getList,
-            segregateData, orgDoneData, applyDetailChange) {
+            segregateData, orgDoneData, applyDetailChange, deleteItem,
+            deleteFromList) {
     $scope.undone = $rootScope.donors;
     $scope.done = $rootScope.donorsDone = [];
     $scope.loading = true;
@@ -311,6 +347,18 @@ redDashboard.controller('DonorsCtrl', [
         // cancelled
       });
     };
+
+    // Delete an item
+    $scope.delete = function (ev, id, type) {
+      $mdDialog.show(confirmDelete($mdDialog, ev)).then(function () {
+        deleteItem('donor', { id: id }).then(function (resp) {
+          _.assign($scope,
+                   deleteFromList(id, type, $scope.undone, $scope.done));
+        });
+      }, function () {
+        console.log('cancelled delete');
+      });
+    };
   }
 ]);
 
@@ -320,9 +368,11 @@ redDashboard.controller('DonorsCtrl', [
  */
 redDashboard.controller('CampsCtrl', [
   '$scope', '$rootScope', '$routeParams', '$http', '$mdDialog', 'getList',
-  'segregateData', 'orgDoneData', 'applyDetailChange',
+  'segregateData', 'orgDoneData', 'applyDetailChange', 'deleteItem',
+  'deleteFromList',
   function ($scope, $rootScope, $routeParams, $http, $mdDialog, getList,
-            segregateData, orgDoneData, applyDetailChange) {
+            segregateData, orgDoneData, applyDetailChange, deleteItem,
+            deleteFromList) {
     $scope.undone = $rootScope.camps;
     $scope.done = $rootScope.campsDone = [];
     $scope.loading = true;
@@ -354,6 +404,18 @@ redDashboard.controller('CampsCtrl', [
                                campsDone: $scope.done });
       }, function () {
         // cancelled
+      });
+    };
+
+    // Delete an item
+    $scope.delete = function (ev, id, type) {
+      $mdDialog.show(confirmDelete($mdDialog, ev)).then(function () {
+        deleteItem('camp', { id: id }).then(function (resp) {
+          _.assign($scope,
+                   deleteFromList(id, type, $scope.undone, $scope.done));
+        });
+      }, function () {
+        console.log('cancelled delete');
       });
     };
   }
@@ -520,10 +582,8 @@ redDashboard.controller('UserCtrl', [
     $scope.user = {username: 'john.doe', password: 'foobar'};
     $scope.message = '';
     $scope.submit = function () {
-      console.log('sending data');
       $http.post('/authenticate', $scope.user)
            .success(function (data, status, headers, config) {
-             console.log('got reply', data);
              $window.sessionStorage.token = data.token;
              $rootScope.init(data.user);
              $window.history.back();
@@ -827,6 +887,29 @@ redDashboard.factory('indexOfId', function () {
 });
 
 
+/**
+ * Delete item
+ *
+ * @param {String} collectionName
+ *    Name of the collection the item belongs to.
+ *
+ * @param {Object} data
+ *    Object with properties to identify the item to be deleted.
+ *
+ * @return {Promise}
+ *    Returns a promise which is completed when the item is deleted.
+ */
+redDashboard.factory('deleteItem', ['$http', function ($http) {
+  return function (collectionName, data) {
+    var promise = $http.post('/api/delete/' + collectionName, data)
+                       .then(function (resp) {
+                         return resp.data;
+                       });
+    return promise;
+  };
+}]);
+
+
 redDashboard.factory('authInterceptor', function ($rootScope, $q, $window) {
   return {
     request: function (config) {
@@ -846,10 +929,48 @@ redDashboard.factory('authInterceptor', function ($rootScope, $q, $window) {
 });
 
 
-redDashboard.config(function ($httpProvider) {
-  $httpProvider.interceptors.push('authInterceptor');
-});
+/**
+ * Delete item from done/undone list.
+ *
+ * @param {Number} id
+ *    id of the item to be deleted.
+ *
+ * @param {String} type
+ *    Type of the list ('done'/'undone')
+ *
+ * @param {Object} undone
+ *    Undone list
+ *
+ * @param {Object} done
+ *    Done list
+ *
+ * @return {Object}
+ *    Returns the lists after performing deletion.
+ *    {
+ *      done: [],
+ *      undone: []
+ *    }
+ */
+redDashboard.factory('deleteFromList', ['indexOfId', function (indexOfId) {
+  return function (id, type, undone, done) {
+    var targetList, index;
+    if (type == 'undone') {
+      targetList = undone;
+    } else if (type == 'done') {
+      targetList = done;
+    }
+    index = indexOfId(targetList, id);
+    targetList.splice(index, 1);
+    return {
+      done: done,
+      undone: undone
+    };
+  }
+}]);
 
+
+// Directives
+// ==================================================
 
 redDashboard.directive('cardDone', function () {
   return {
@@ -863,5 +984,18 @@ redDashboard.directive('cardUndone', function () {
   return {
     restrict: 'E',
     templateUrl: 'templates/cardUndone.html'
+  };
+});
+
+
+// Stop event propagation from child to parent.
+redDashboard.directive('stopEvent', function () {
+  return {
+    restrict: 'A',
+    link: function (scope, element, attr) {
+      element.bind('click', function (e) {
+        e.stopPropagation();
+      });
+    }
   };
 });

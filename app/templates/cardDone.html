@@ -1,13 +1,16 @@
 <md-card>
   <md-card-content ng-click="detail(item, 'done')">
     <div layout="row" layout-align="space-between center">
-      <div flex="55">
+      <div flex="50">
         <ng-md-icon class="avatar" icon="{{type == 'person' ? 'person' : 'group_work'}}"></ng-md-icon>
         <span class="listName">{{item[primaryProp]}}</span>
       </div>
       <div flex="45">
         <ng-md-icon class="avatar" icon="{{type == 'person' ? 'lens' : 'location_on'}}"></ng-md-icon>
         <span class="listOthers">{{item[secondaryProp]}}</span>
+      </div>
+      <div flex>
+        <ng-md-icon class="avatar" icon="delete" ng-click="delete($event, item.id, 'done')" stop-event></ng-md-icon>
       </div>
     </div>
   </md-card-content>
