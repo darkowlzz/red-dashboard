@@ -240,7 +240,7 @@ router.get('/api/stats/donors/done', function (req, res) {
 
 // get total camps count
 router.get('/api/stats/camps', function (req, res) {
-  Donor.find({}).count().exec(function (err, count) {
+  Camp.find({}).count().exec(function (err, count) {
     res.json({ count: count });
   });
 });

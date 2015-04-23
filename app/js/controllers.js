@@ -369,7 +369,7 @@ redDashboard.controller('CampsCtrl', [
 
     // Properties to be displayed in brief
     $scope.primaryProp = 'title';
-    $scope.secondaryProp = 'location';
+    $scope.secondaryProp = 'address';
     $scope.type = 'camp'; // type of icons
 
     var index, elem, removed;
